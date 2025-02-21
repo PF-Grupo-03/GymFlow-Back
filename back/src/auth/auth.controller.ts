@@ -19,5 +19,4 @@ export class AuthController {
         const { email, password } = loginUser;
         const token = await this.authService.signin(email, password);
     }
-
 }
