@@ -2,6 +2,8 @@ import { BadRequestException, Injectable, UnauthorizedException } from "@nestjs/
 import { PrismaService } from "src/prisma.service";
 import { UsersService } from "src/users/users.service";
 import * as bcrypt from "bcrypt";
+import { JwtService } from "@nestjs/jwt";
+import { CreateUserDto } from "src/users/users.dto";
 
 
 @Injectable()
@@ -10,9 +12,10 @@ export class AuthService {
     constructor(
         private readonly prisma: PrismaService,
         private readonly userService: UsersService,
+        private jwtService: JwtService,
     ) {}
 
-    async signup( user: any, confirmPassword: string ) {
+    async signup( user: Partial<CreateUserDto>, confirmPassword: string ) {
         
         if (user.password !== confirmPassword) {
             throw new BadRequestException('Las contraseñas no coinciden');
@@ -28,29 +31,29 @@ export class AuthService {
         const hashPassword = await bcrypt.hash(user.password, 10);
         const newUser = {...user, password: hashPassword};
         
-        const saveUser = await this.prisma.user.create({ data: newUser });
+        const saveUser = await this.prisma.users.create({ data: newUser });
         
         const {password, ...userWithoutPassword} = saveUser;
 
 
         // Generamos el token de autenticación.
-        // const payload = {
-        //     id: saveUser.id,
-        //     email: saveUser.email,
-        //     role: saveUser.role
-        // };
-        // const token = this.jwtService.sign(payload);
+        const payload = {
+            id: saveUser.id,
+            email: saveUser.email,
+            role: saveUser.role
+        };
+        const token = this.jwtService.sign(payload);
 
         return {
             user: userWithoutPassword, 
-            //token
+            token
         };
     }
         
         
     async signin( email: string, password: string ) {
     
-        const user = await this.prisma.user.findUnique({
+        const user = await this.prisma.users.findUnique({
             where: { email: email.toLowerCase() },
         });
         if (!user) {
@@ -62,16 +65,16 @@ export class AuthService {
         throw new UnauthorizedException('Credenciales inválidas');
         }
           
-        // const payload = {
-        //     id: user.id,
-        //     email: user.email,
-        //     isAdmin: user.isAdmin,
-        // };
+        const payload = {
+            id: user.id,
+            email: user.email,
+            role: user.role,
+        };
       
-        // const token = this.jwtService.sign(payload);
+        const token = this.jwtService.sign(payload);
     
         return {
-        // token,
+        token,
         message: "Usuario loggeado con éxito.",
         };  
         
