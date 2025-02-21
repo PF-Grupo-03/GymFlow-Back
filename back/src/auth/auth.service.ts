@@ -10,15 +10,15 @@ import { CreateUserDto } from "src/users/users.dto";
 export class AuthService {
 
     constructor(
-        private readonly prisma: PrismaService,
-        private readonly userService: UsersService,
-        private jwtService: JwtService,
+      private readonly prisma: PrismaService,
+      private readonly userService: UsersService,
+      private jwtService: JwtService,
     ) {}
 
     async signup( user: Partial<CreateUserDto>, confirmPassword: string ) {
         
         if (user.password !== confirmPassword) {
-            throw new BadRequestException('Las contraseñas no coinciden');
+          throw new BadRequestException('Las contraseñas no coinciden');
         }
                   
         const existingUser = await this.userService.findUserByEmail(user.email);
@@ -38,45 +38,45 @@ export class AuthService {
 
         // Generamos el token de autenticación.
         const payload = {
-            id: saveUser.id,
-            email: saveUser.email,
-            role: saveUser.role
+          id: saveUser.id,
+          email: saveUser.email,
+          role: saveUser.role
         };
         const token = this.jwtService.sign(payload);
 
         return {
-            user: userWithoutPassword, 
-            token
+          user: userWithoutPassword, 
+          token
         };
     }
         
         
     async signin( email: string, password: string ) {
     
-        const user = await this.prisma.users.findUnique({
-            where: { email: email.toLowerCase() },
-        });
-        if (!user) {
-        throw new UnauthorizedException('Credenciales inválidas');
-        }
-    
-        const passwordMatch = await bcrypt.compare(password, user.password);
-        if (!passwordMatch) {
-        throw new UnauthorizedException('Credenciales inválidas');
-        }
-          
-        const payload = {
-            id: user.id,
-            email: user.email,
-            role: user.role,
-        };
-      
-        const token = this.jwtService.sign(payload);
-    
-        return {
-        token,
-        message: "Usuario loggeado con éxito.",
-        };  
-        
+    const user = await this.prisma.users.findUnique({
+      where: { email: email.toLowerCase() },
+    });
+    if (!user) {
+    throw new UnauthorizedException('Credenciales inválidas');
     }
+
+    const passwordMatch = await bcrypt.compare(password, user.password);
+    if (!passwordMatch) {
+    throw new UnauthorizedException('Credenciales inválidas');
+    }
+      
+    const payload = {
+      id: user.id,
+      email: user.email,
+      role: user.role,
+    };
+  
+    const token = this.jwtService.sign(payload);
+
+    return {
+    token,
+    message: "Usuario loggeado con éxito.",
+    };  
+      
+  }
 }
