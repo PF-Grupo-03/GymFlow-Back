@@ -9,22 +9,23 @@ import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
-  constructor(
-    private readonly prisma: PrismaService,
-    private readonly userService: UsersService,
-  ) {}
+    constructor(
+      private readonly prisma: PrismaService,
+      private readonly userService: UsersService,
+      private jwtService: JwtService,
+    ) {}
 
-  async signup(user: any, confirmPassword: string) {
-    if (user.password !== confirmPassword) {
-      throw new BadRequestException('Las contraseñas no coinciden');
-    }
-
-    const existingUser = await this.userService.findUserByEmail(user.email);
-
-    if (existingUser) {
-      throw new BadRequestException('El email ya está registrado');
-    }
-
+    async signup( user: Partial<CreateUserDto>, confirmPassword: string ) {
+        
+        if (user.password !== confirmPassword) {
+          throw new BadRequestException('Las contraseñas no coinciden');
+        }
+                  
+        const existingUser = await this.userService.findUserByEmail(user.email);
+        
+        if (existingUser) {
+         throw new BadRequestException('El email ya está registrado');
+        }
     // Hasheamos la contraseña y creamos el nuevo usuario.
     const hashPassword = await bcrypt.hash(user.password, 10);
     const newUser = { ...user, password: hashPassword };
@@ -33,45 +34,47 @@ export class AuthService {
 
     const { password, ...userWithoutPassword } = saveUser;
 
-    // Generamos el token de autenticación.
-    // const payload = {
-    //     id: saveUser.id,
-    //     email: saveUser.email,
-    //     role: saveUser.role
-    // };
-    // const token = this.jwtService.sign(payload);
+        // Generamos el token de autenticación.
+        const payload = {
+          id: saveUser.id,
+          email: saveUser.email,
+          role: saveUser.role
+        };
+        const token = this.jwtService.sign(payload);
 
-    return {
-      user: userWithoutPassword,
-      //token
-    };
-  }
-
-  async signin(email: string, password: string) {
+        return {
+          user: userWithoutPassword, 
+          token
+        };
+    }
+        
+        
+    async signin( email: string, password: string ) {
+    
     const user = await this.prisma.users.findUnique({
       where: { email: email.toLowerCase() },
     });
     if (!user) {
-      throw new UnauthorizedException('Credenciales inválidas');
+    throw new UnauthorizedException('Credenciales inválidas');
     }
 
     const passwordMatch = await bcrypt.compare(password, user.password);
     if (!passwordMatch) {
-      throw new UnauthorizedException('Credenciales inválidas');
+    throw new UnauthorizedException('Credenciales inválidas');
     }
-
-    // const payload = {
-    //     id: user.id,
-    //     email: user.email,
-    //     isAdmin: user.isAdmin,
-    // };
-
-    // const token = this.jwtService.sign(payload);
+      
+    const payload = {
+      id: user.id,
+      email: user.email,
+      role: user.role,
+    };
+  
+    const token = this.jwtService.sign(payload);
 
     return {
-      // token,
-      message: 'Usuario loggeado con éxito.',
-    };
+    token,
+    message: "Inicio de sesión con éxito.",
+    };  
+      
   }
 }
-
