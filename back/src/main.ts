@@ -20,7 +20,16 @@ async function bootstrap() {
 
   const loggerMiddleware = new LoggerMiddleware();
   app.use(loggerMiddleware.use);
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(
+    new ValidationPipe({
+      // Elimina propiedades no definidas en el DTO.
+      whitelist: true,
+      // Lanza un error si hay propiedades no definidas
+      forbidNonWhitelisted: true,
+      // Transforma automáticamente los valores a los tipos definidos en el DTO
+      transform: true,
+    }),
+  );
 
   await app.listen(process.env.PORT ?? 3000);
 }
