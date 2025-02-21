@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from 'src/prisma.service';
 
 @Injectable()
 export class UsersService {
@@ -11,42 +11,37 @@ export class UsersService {
     return userWithoutPassword;
   }
 
-async getAllUsers() {
-    const users = await this.prisma.user.findMany();
+  async getAllUsers() {
+    const users = await this.prisma.users.findMany();
 
-    if (!users.length)
-      throw new NotFoundException(
-        'Usuarios no encontrados',
-      );
+    if (!users.length) throw new NotFoundException('Usuarios no encontrados');
 
     return users.map(this.excludePassword);
-    
-}
+  }
 
-async getUserById(id: string) {
-  const user = await this.prisma.user.findUnique({
-   where: {
-    id: id,
-   },});
+  async getUserById(id: string) {
+    const user = await this.prisma.users.findUnique({
+      where: {
+        id: id,
+      },
+    });
 
-  if (!user) throw new NotFoundException('Usuario no encontrado');
-  return this.excludePassword(user);
-}
+    if (!user) throw new NotFoundException('Usuario no encontrado');
+    return this.excludePassword(user);
+  }
 
+  async updateUser(id: string, updatedData: any) {
+    const user = await this.prisma.users.update({
+      where: { id },
+      data: updatedData,
+    });
+    if (!user) throw new NotFoundException(`el usuario de id ${id} no existe`);
+    return this.excludePassword(user);
+  }
 
-async updateUser(id: string, updatedData: any) {
-  const user = await this.prisma.user.update({
-    where: { id },
-    data: updatedData,
-  });
-  if (!user) throw new NotFoundException(`el usuario de id ${id} no existe`);
-  return this.excludePassword(user);
-}
-
-async findUserByEmail(email: string) {
-  return await this.prisma.user.findUnique({
-    where: { email },
-  });
-}
-
+  async findUserByEmail(email: string) {
+    return await this.prisma.users.findUnique({
+      where: { email },
+    });
+  }
 }
