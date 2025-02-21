@@ -1,14 +1,14 @@
-import { BadRequestException, Injectable, UnauthorizedException } from "@nestjs/common";
-import { PrismaService } from "src/prisma.service";
-import { UsersService } from "src/users/users.service";
-import * as bcrypt from "bcrypt";
-import { JwtService } from "@nestjs/jwt";
-import { CreateUserDto } from "src/users/users.dto";
-
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { PrismaService } from 'src/prisma.service';
+import { UsersService } from 'src/users/users.service';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
-
     constructor(
       private readonly prisma: PrismaService,
       private readonly userService: UsersService,
@@ -26,15 +26,13 @@ export class AuthService {
         if (existingUser) {
          throw new BadRequestException('El email ya está registrado');
         }
+    // Hasheamos la contraseña y creamos el nuevo usuario.
+    const hashPassword = await bcrypt.hash(user.password, 10);
+    const newUser = { ...user, password: hashPassword };
 
-        // Hasheamos la contraseña y creamos el nuevo usuario.
-        const hashPassword = await bcrypt.hash(user.password, 10);
-        const newUser = {...user, password: hashPassword};
-        
-        const saveUser = await this.prisma.users.create({ data: newUser });
-        
-        const {password, ...userWithoutPassword} = saveUser;
+    const saveUser = await this.prisma.users.create({ data: newUser });
 
+    const { password, ...userWithoutPassword } = saveUser;
 
         // Generamos el token de autenticación.
         const payload = {
@@ -75,7 +73,7 @@ export class AuthService {
 
     return {
     token,
-    message: "Usuario loggeado con éxito.",
+    message: "Inicio de sesión con éxito.",
     };  
       
   }
