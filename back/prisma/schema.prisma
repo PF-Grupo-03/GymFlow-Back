@@ -18,8 +18,10 @@ model Users {
   nameAndLastName String @unique
   email     String   @unique
   password  String   @unique
-  phone String @unique
+  bDate DateTime @unique
   address String @unique
+  phone String @unique
+  role String @default("user")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
