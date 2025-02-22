@@ -8,6 +8,7 @@ import { UsersService } from 'src/users/users.service';
 import * as bcrypt from 'bcrypt';
 import { CreateUserDto } from 'src/users/users.dto';
 import { JwtService } from '@nestjs/jwt';
+import { Users } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
@@ -17,12 +18,11 @@ export class AuthService {
       private jwtService: JwtService,
     ) {}
 
-    async signup( user: Partial<CreateUserDto>, confirmPassword: string ) {
+    async signup( user: Omit<Users, 'id' | 'createdAt' | 'updatedAt'>) {
         
-        if (user.password !== confirmPassword) {
-          throw new BadRequestException('Las contraseñas no coinciden');
-        }
-                  
+        // if (user.password !== confirmPassword) {
+        //   throw new BadRequestException('Las contraseñas no coinciden');
+        // }
         const existingUser = await this.userService.findUserByEmail(user.email);
         
         if (existingUser) {
@@ -40,7 +40,7 @@ export class AuthService {
         const payload = {
           id: saveUser.id,
           email: saveUser.email,
-          role: saveUser.role
+          role: saveUser
         };
         const token = this.jwtService.sign(payload);
 
@@ -68,15 +68,12 @@ export class AuthService {
     const payload = {
       id: user.id,
       email: user.email,
-      role: user.role,
+      role: user,
     };
   
     const token = this.jwtService.sign(payload);
 
-    return {
-    token,
-    message: "Inicio de sesión con éxito.",
-    };  
+    return token;
       
   }
 }
