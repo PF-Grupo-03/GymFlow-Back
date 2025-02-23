@@ -12,22 +12,27 @@ import { Users } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
-    constructor(
-      private readonly prisma: PrismaService,
-      private readonly userService: UsersService,
-      private jwtService: JwtService,
-    ) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly userService: UsersService,
+    private jwtService: JwtService,
+  ) {}
 
-    async signup( user: Omit<Users, 'id' | 'createdAt' | 'updatedAt'>) {
-        
-        // if (user.password !== confirmPassword) {
-        //   throw new BadRequestException('Las contraseñas no coinciden');
-        // }
-        const existingUser = await this.userService.findUserByEmail(user.email);
-        
-        if (existingUser) {
-         throw new BadRequestException('El email ya está registrado');
-        }
+  async signup( user: Omit<Users, 'id' | 'createdAt' | 'updatedAt'>) {
+      
+    // if (user.password !== confirmPassword) {
+    //   throw new BadRequestException('Las contraseñas no coinciden');
+    // }
+    const existingUserPhone = await this.prisma.users.findUnique({ where: { phone: user.phone } });
+    if (existingUserPhone) {
+      throw new BadRequestException('El teléfono ya está registrado');
+    }
+
+    const existingUser = await this.userService.findUserByEmail(user.email);
+    
+    if (existingUser) {
+      throw new BadRequestException('El email ya está registrado');
+    }
     // Hasheamos la contraseña y creamos el nuevo usuario.
     const hashPassword = await bcrypt.hash(user.password, 10);
     const newUser = { ...user, password: hashPassword };
@@ -36,22 +41,22 @@ export class AuthService {
 
     const { password, ...userWithoutPassword } = saveUser;
 
-        // Generamos el token de autenticación.
-        const payload = {
-          id: saveUser.id,
-          email: saveUser.email,
-          role: saveUser
-        };
-        const token = this.jwtService.sign(payload);
+    // Generamos el token de autenticación.
+    const payload = {
+      id: saveUser.id,
+      email: saveUser.email,
+      role: saveUser
+    };
+    const token = this.jwtService.sign(payload);
 
-        return {
-          user: userWithoutPassword, 
-          token
-        };
-    }
+    return {
+      user: userWithoutPassword, 
+      token
+    };
+  }
         
         
-    async signin( email: string, password: string ) {
+  async signin( email: string, password: string ) {
     
     const user = await this.prisma.users.findUnique({
       where: { email: email.toLowerCase() },

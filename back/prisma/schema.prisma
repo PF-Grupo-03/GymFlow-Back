@@ -15,11 +15,11 @@ datasource db {
 
 model Users {
   id        String   @id @default(uuid())
-  nameAndLastName String @unique
+  nameAndLastName String 
   email     String   @unique
-  password  String   @unique
-  bDate DateTime @unique
-  address String @unique
+  password  String 
+  bDate DateTime 
+  address String 
   phone String @unique
   role String @default("user")
   createdAt DateTime @default(now())
