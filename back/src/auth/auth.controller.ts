@@ -11,7 +11,7 @@ export class AuthController {
     async signup(@Body() user: CreateUserDto ) {
         const formattedBDate = new Date(user.bDate);
         if (isNaN(formattedBDate.getTime())) {
-            throw new BadRequestException('bDate must be a valid date');
+            throw new BadRequestException('La fecha de nacimiento debe ser una fecha valida');
         }
 
         const { confirmPassword, ...newUser } = user;
