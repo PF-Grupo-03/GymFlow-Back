@@ -45,7 +45,7 @@ export class AuthService {
     const payload = {
       id: saveUser.id,
       email: saveUser.email,
-      role: saveUser
+      role: saveUser.role
     };
     const token = this.jwtService.sign(payload);
 
@@ -56,7 +56,7 @@ export class AuthService {
   }
         
         
-  async signin( email: string, password: string ) {
+  async signin( email: string, passwordLoggin: string ) {
     
     const user = await this.prisma.users.findUnique({
       where: { email: email.toLowerCase() },
@@ -65,7 +65,7 @@ export class AuthService {
     throw new UnauthorizedException('Credenciales inválidas');
     }
 
-    const passwordMatch = await bcrypt.compare(password, user.password);
+    const passwordMatch = await bcrypt.compare(passwordLoggin, user.password);
     if (!passwordMatch) {
     throw new UnauthorizedException('Credenciales inválidas');
     }
@@ -73,12 +73,17 @@ export class AuthService {
     const payload = {
       id: user.id,
       email: user.email,
-      role: user,
+      role: user.role,
     };
   
     const token = this.jwtService.sign(payload);
 
-    return token;
+    const {password, role, ...withoutPasswordAndRole} = user;
+    
+    return {
+      withoutPasswordAndRole,
+      token
+    };
       
   }
 }
