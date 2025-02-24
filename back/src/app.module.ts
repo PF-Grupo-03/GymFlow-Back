@@ -6,6 +6,7 @@ import { PaymentModule } from './payment/payment.module';
 import { AuthModule } from './auth/auth.module';
 import { RoutinesModule } from './routines/routines.module';
 import { JwtModule } from '@nestjs/jwt';
+import { FileUploadModule } from './file-upload/file-upload.module';
 
 @Module({
   imports: [
@@ -19,7 +20,8 @@ import { JwtModule } from '@nestjs/jwt';
     RoutinesModule, 
     MembersModule, 
     AppointmentsModule, 
-    PaymentModule
+    PaymentModule,
+    FileUploadModule,
   ],
   controllers: [],
   providers: [],
