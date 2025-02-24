@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -20,9 +21,6 @@ export class AuthService {
 
   async signup( user: Omit<Users, 'id' | 'createdAt' | 'updatedAt'>) {
       
-    // if (user.password !== confirmPassword) {
-    //   throw new BadRequestException('Las contraseñas no coinciden');
-    // }
     const existingUserPhone = await this.prisma.users.findUnique({ where: { phone: user.phone } });
     if (existingUserPhone) {
       throw new BadRequestException('El teléfono ya está registrado');
@@ -33,13 +31,29 @@ export class AuthService {
     if (existingUser) {
       throw new BadRequestException('El email ya está registrado');
     }
+
     // Hasheamos la contraseña y creamos el nuevo usuario.
     const hashPassword = await bcrypt.hash(user.password, 10);
-    const newUser = { ...user, password: hashPassword };
-
-    const saveUser = await this.prisma.users.create({ data: newUser });
+    
+    const role = user.role === 'USER_TRAINING' ? 'USER_TRAINING' : 'USER_MEMBER';
+    
+    const saveUser = await this.prisma.users.create({ 
+      data: {
+        ...user,
+        password: hashPassword,
+        role,
+        approved: role === 'USER_MEMBER',
+      }
+    });
 
     const { password, ...userWithoutPassword } = saveUser;
+
+    if (!saveUser.approved) {
+      return {
+        messege: "Tu solicitud fue enviada. Un administrador de aprobar tu cuenta.",
+        user: userWithoutPassword
+      }
+    }
 
     // Generamos el token de autenticación.
     const payload = {
@@ -63,6 +77,11 @@ export class AuthService {
     });
     if (!user) {
     throw new UnauthorizedException('Credenciales inválidas');
+    }
+
+
+    if (!user.approved) {
+      throw new ForbiddenException('Tu cuenta aún no fue aprobada por un administrador');
     }
 
     const passwordMatch = await bcrypt.compare(passwordLoggin, user.password);
