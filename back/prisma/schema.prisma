@@ -13,62 +13,63 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 enum UserRole {
-  USER_MEMBER   
-  USER_TRAINING 
-  USER_ADMIN    
+  USER_MEMBER
+  USER_TRAINING
+  USER_ADMIN
 }
 
-
-enum MembershipType {
+enum MemberShipType {
   BASIC
   PREMIUM
   DIAMONT
 }
 
-
 model Users {
-  id        String   @id @default(uuid())
-  nameAndLastName String 
-  email     String   @unique
-  password  String 
-  bDate DateTime 
-  address String 
-  phone String @unique
+  id              String   @id @default(uuid())
+  nameAndLastName String
+  email           String   @unique
+  password        String
+  bDate           DateTime
+  address         String
+  phone           String   @unique
 
-  role UserRole @default("USER_MEMBER")
-  
+  role UserRole @default(USER_MEMBER)
+
   approved Boolean @default(false)
 
-  member Member? @relation( fields: [id], references: [userId] )
+  member Member?
+
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Member {
-  id        String   @id @default(uuid())
-  userId    String   @unique
+  id     String @id @default(uuid())
+  userId String @unique
 
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user Users @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   memberShipType MemberShipType
 
   startDate DateTime @default(now())
-  endDate DateTime
+  endDate   DateTime
+
+  payment Payment[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Payment {
-  id        String   @id @default(uuid())
-  memberId  String
+  id       String @id @default(uuid())
+  memberId String
 
-  member    Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  member Member @relation(fields: [memberId], references: [id])
 
-  amount    Float
+  amount      Float
   PaymentDate DateTime @default(now())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
