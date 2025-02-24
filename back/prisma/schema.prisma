@@ -13,15 +13,62 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum UserRole {
+  USER_MEMBER
+  USER_TRAINING
+  USER_ADMIN
+}
+
+enum MemberShipType {
+  BASIC
+  PREMIUM
+  DIAMONT
+}
+
 model Users {
-  id        String   @id @default(uuid())
-  nameAndLastName String 
-  email     String   @unique
-  password  String 
-  bDate DateTime 
-  address String 
-  phone String @unique
-  role String @default("user")
+  id              String   @id @default(uuid())
+  nameAndLastName String
+  email           String   @unique
+  password        String
+  bDate           DateTime
+  address         String
+  phone           String   @unique
+
+  role UserRole @default(USER_MEMBER)
+
+  approved Boolean @default(false)
+
+  member Member?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Member {
+  id     String @id @default(uuid())
+  userId String @unique
+
+  user Users @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  memberShipType MemberShipType
+
+  startDate DateTime @default(now())
+  endDate   DateTime
+
+  payment Payment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Payment {
+  id       String @id @default(uuid())
+  memberId String
+
+  member Member @relation(fields: [memberId], references: [id])
+
+  amount      Float
+  PaymentDate DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
