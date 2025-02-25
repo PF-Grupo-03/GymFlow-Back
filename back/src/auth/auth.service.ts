@@ -18,7 +18,7 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async signup( user: Omit<Users, 'id' | 'createdAt' | 'updatedAt'>) {
+  async signup( user: Omit<Users, 'id' | 'createdAt' | 'updatedAt' | 'approved'>) {
       
     const existingUserPhone = await this.prisma.users.findUnique({ where: { phone: user.phone } });
     if (existingUserPhone) {
@@ -34,23 +34,33 @@ export class AuthService {
     // Hasheamos la contraseña y creamos el nuevo usuario.
     const hashPassword = await bcrypt.hash(user.password, 10);
     
+    // Asignamos el rol y el estado de aprobación.
     const role = user.role === 'USER_TRAINING' ? 'USER_TRAINING' : 'USER_MEMBER';
-    
+    const approved = role === 'USER_MEMBER';
+
     const saveUser = await this.prisma.users.create({ 
       data: {
         ...user,
         password: hashPassword,
         role,
-        approved: role === 'USER_MEMBER',
+        approved,
+      },
+      select: {
+        id: true,
+        nameAndLastName: true,
+        email: true,
+        phone: true,
+        role: true,
+        approved: true,
       }
     });
 
-    const { password, ...userWithoutPassword } = saveUser;
+    // const { password, ...userWithoutPassword } = saveUser;
 
     if (!saveUser.approved) {
       return {
         messege: "Tu solicitud fue enviada. Un administrador de aprobar tu cuenta.",
-        user: userWithoutPassword
+        user: saveUser
       }
     }
 
@@ -63,7 +73,7 @@ export class AuthService {
     const token = this.jwtService.sign(payload);
 
     return {
-      user: userWithoutPassword, 
+      user: saveUser, 
       token
     };
   }

@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Transform } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import {
   IsBoolean,
   IsDate,
@@ -47,7 +47,7 @@ export class CreateUserDto {
   @ApiProperty({ example: '1999-01-01' })
   @IsNotEmpty()
   @IsDate()
-  @Transform(({ value }) => new Date(value)) // Convierte el string a Date
+  @Type(() => Date) // Convierte el string a Date
   bDate: Date;
 
   @ApiProperty({ example: 'Av. Juan XXIII, 123' })
@@ -68,10 +68,6 @@ export class CreateUserDto {
   @IsNotEmpty()
   @IsEnum(UserRole)
   role: UserRole;
-
-  @ApiProperty({ example: 'false' })
-  @IsBoolean()
-  approved: boolean;
 
   @IsOptional()
   @IsEnum(MemberShipType)

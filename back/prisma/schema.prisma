@@ -34,40 +34,40 @@ model Users {
   address         String
   phone           String   @unique
 
-  role UserRole @default(USER_MEMBER)
+  role            UserRole @default(USER_MEMBER)
 
-  approved Boolean @default(false)
+  approved        Boolean @default(false)
 
-  member Member?
+  member          Member?
 
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }
 
 model Member {
-  id     String @id @default(uuid())
-  userId String @unique
+  id              String @id @default(uuid())
+  userId          String @unique
 
-  user Users @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user            Users @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  memberShipType MemberShipType
+  memberShipType  MemberShipType
 
-  startDate DateTime @default(now())
-  endDate   DateTime
+  startDate       DateTime @default(now())
+  endDate         DateTime
 
-  payment Payment[]
+  payment         Payment[]
   appointments    Appointment[]  // Relación con Appointment
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }
 
 model Payment {
-  id       String @id @default(uuid())
-  memberId String
+  id          String @id @default(uuid())
+  memberId    String
 
-  member Member @relation(fields: [memberId], references: [id])
+  member      Member @relation(fields: [memberId], references: [id])
 
   amount      Float
   PaymentDate DateTime @default(now())
@@ -85,4 +85,23 @@ model Appointment {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Exercise {
+  id               String   @id @default(uuid())
+  name             String
+  desciption       String
+  category         String
+  gifUrl           String
+}
+
+model Routine {
+  id            String   @id @default(uuid())
+  name          String
+  muscleGroup   String
+  category      String
+  repetitions   Int
+  exerciseId    String
+
+  exercise      Exercise @relation(fields: [exerciseId], references: [id])
 }
