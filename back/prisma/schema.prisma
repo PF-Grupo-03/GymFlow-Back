@@ -89,8 +89,9 @@ model Appointment {
 
 model Exercise {
   id         String    @id @default(uuid())
-  name       String
-  desciption String
+  name        String
+  series      Int
+  repetitions Int
   category   String
   gifUrl     String
   routines   Routine[]
@@ -98,10 +99,8 @@ model Exercise {
 
 model Routine {
   id          String @id @default(uuid())
-  name        String
-  muscleGroup String
+  day         String
   category    String
-  repetitions Int
   exerciseId  String
 
   exercise Exercise @relation(fields: [exerciseId], references: [id])
