@@ -14,30 +14,31 @@ export class UsersService {
 
   private excludePassword(user: CreateUserDto) {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password, ...userWithoutPassword } = user;
+    const { password, confirmPassword, ...userWithoutPassword } = user;
     return userWithoutPassword;
   }
 
   async getAllUsers() {
-    const users = await this.prisma.users.findMany({
-      include: { member: true },
-    });
+    const users = await this.prisma.users.findMany();
+    
 
     if (!users.length) throw new NotFoundException('Usuarios no encontrados');
 
-    return users.map(this.excludePassword);
+    const userMap = users.map( (user) => this.excludePassword);
+    return userMap;
   }
 
   async getUserById(id: string) {
     const user = await this.prisma.users.findUnique({
       where: {
         id: id,
-      },
-      include: { member: true },
+      }
     });
 
     if (!user) throw new NotFoundException('Usuario no encontrado');
-    return this.excludePassword(user);
+
+    const { password, ...userWithoutPassword } = user;
+    return userWithoutPassword;
   }
 
   async updateUser(id: string, updatedData: Partial<CreateUserDto>) {
@@ -48,7 +49,9 @@ export class UsersService {
         include: { member: true },
       });
 
-      return this.excludePassword(user);
+      const { password, ...userWithoutPassword } = user;
+    return userWithoutPassword
+
     } catch (error) {
       if (error.code === 'P2025') {
         throw new NotFoundException(`El usuario con ID ${id} no existe`);
@@ -65,19 +68,19 @@ export class UsersService {
   }
 
   async approveTrainer(userId: string, dto: ApproveTrainerDto) {
-    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    const user = await this.prisma.users.findUnique({ where: { id: userId } });
 
     if (!user) {
       throw new NotFoundException('Usuario no encontrado');
     }
 
-    if (user.UserRole !== 'USER_TRAINING') {
+    if (user.role !== 'USER_TRAINING') {
       throw new BadRequestException(
         'Solo los entrenadores pueden ser aprobados',
       );
     }
 
-    return this.prisma.user.update({
+    return this.prisma.users.update({
       where: { id: userId },
       data: { approved: dto.approved },
     });
