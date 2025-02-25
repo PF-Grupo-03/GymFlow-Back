@@ -4,3 +4,9 @@ export enum UserRole {
   USER_TRAINING = 'USER_TRAINING',
   USER_ADMIN = 'USER_ADMIN',
 }
+
+export enum MemberShipType {
+  BASIC = 'BASIC',
+  PREMIUM = 'PREMIUM',
+  DIAMOND = 'DIAMOND',
+}
