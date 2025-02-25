@@ -24,6 +24,14 @@ export class CreateUserDto {
   @Length(3, 100)
   nameAndLastName: string;
 
+  @ApiProperty({ example: '30123456' })
+  @IsNotEmpty()
+  @Matches(/^\d{7,8}$/, {
+    message: 'El DNI debe contener entre 7 y 8 dígitos numéricos',
+  })
+  dni: string;
+
+
   @ApiProperty({ example: 'juanperez@gmail.com' })
   @IsNotEmpty()
   @IsEmail()
