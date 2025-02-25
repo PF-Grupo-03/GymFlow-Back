@@ -19,6 +19,12 @@ export class AuthService {
   ) {}
 
   async signup( user: Omit<Users, 'id' | 'createdAt' | 'updatedAt' | 'approved'>) {
+
+    const existingUserDni = await this.prisma.users.findUnique({ where: { dni: user.dni } });
+    if (existingUserDni) {
+      throw new BadRequestException('El DNI ya está registrado');
+    }
+
       
     const existingUserPhone = await this.prisma.users.findUnique({ where: { phone: user.phone } });
     if (existingUserPhone) {
@@ -41,6 +47,7 @@ export class AuthService {
     const saveUser = await this.prisma.users.create({ 
       data: {
         ...user,
+        dni: user.dni,
         password: hashPassword,
         role,
         approved,
@@ -48,6 +55,7 @@ export class AuthService {
       select: {
         id: true,
         nameAndLastName: true,
+        dni: true,
         email: true,
         phone: true,
         role: true,
