@@ -14,7 +14,7 @@ import {
   MinLength,
   Validate,
 } from 'class-validator';
-import { UserRole } from 'src/roles.enum';
+import { MemberShipType, UserRole } from 'src/roles.enum';
 import { MatchPassword } from 'src/Utils/matchPassword';
 
 export class CreateUserDto {
@@ -73,7 +73,7 @@ export class CreateUserDto {
   @IsBoolean()
   approved: boolean;
 
-  // @IsOptional()
-  // @IsEnum(['basic', 'premium', 'diamont'])
-  // membershipType?: 'basic' | 'premium' | 'diamont';
+  @IsOptional()
+  @IsEnum(MemberShipType)
+  memberShipType?: MemberShipType;
 }
