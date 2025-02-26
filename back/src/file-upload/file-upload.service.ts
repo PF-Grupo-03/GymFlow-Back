@@ -5,7 +5,7 @@ import { PrismaService } from "src/prisma.service";
 
 @Injectable()
 export class FileUploadService {
-    constructor(private readonly cloudinaryConfig: CloudinaryConfig,
+    constructor(private cloudinaryConfig: CloudinaryConfig,
         private readonly prisma: PrismaService
     ) {}
 
