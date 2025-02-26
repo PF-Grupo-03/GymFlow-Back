@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { RoutinesModule } from './routines/routines.module';
 import { JwtModule } from '@nestjs/jwt';
 import { FileUploadModule } from './file-upload/file-upload.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
@@ -22,6 +23,8 @@ import { FileUploadModule } from './file-upload/file-upload.module';
     AppointmentsModule, 
     PaymentModule,
     FileUploadModule,
+    PaymentModule,
+    ConfigModule.forRoot()
   ],
   controllers: [],
   providers: [],
