@@ -89,20 +89,28 @@ model Appointment {
 
 model Exercise {
   id         String    @id @default(uuid())
-  name       String
-  desciption String
+  name        String
+  series      Int
+  repetitions Int
   category   String
-  gifUrl     String
-  routines   Routine[]
+  gifUrl     String?
+  routines   RoutineExercise[]
 }
 
 model Routine {
   id          String @id @default(uuid())
-  name        String
-  muscleGroup String
-  category    String
-  repetitions Int
-  exerciseId  String
+  day         String
+  categories    String[]
+  exercises   RoutineExercise[]
+}
 
-  exercise Exercise @relation(fields: [exerciseId], references: [id])
+model RoutineExercise {
+  routineId String
+  exerciseId String
+
+  routine Routine @relation(fields: [routineId], references: [id], onDelete: Cascade)
+
+  exercise Exercise @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+
+  @@id([routineId, exerciseId])
 }
