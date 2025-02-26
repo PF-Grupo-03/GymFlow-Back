@@ -63,7 +63,8 @@ CREATE TABLE "Appointment" (
 CREATE TABLE "Exercise" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
-    "desciption" TEXT NOT NULL,
+    "series" INTEGER NOT NULL,
+    "repetitions" INTEGER NOT NULL,
     "category" TEXT NOT NULL,
     "gifUrl" TEXT NOT NULL,
 
@@ -73,13 +74,18 @@ CREATE TABLE "Exercise" (
 -- CreateTable
 CREATE TABLE "Routine" (
     "id" TEXT NOT NULL,
-    "name" TEXT NOT NULL,
-    "muscleGroup" TEXT NOT NULL,
-    "category" TEXT NOT NULL,
-    "repetitions" INTEGER NOT NULL,
-    "exerciseId" TEXT NOT NULL,
+    "day" TEXT NOT NULL,
+    "categories" TEXT[],
 
     CONSTRAINT "Routine_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "RoutineExercise" (
+    "routineId" TEXT NOT NULL,
+    "exerciseId" TEXT NOT NULL,
+
+    CONSTRAINT "RoutineExercise_pkey" PRIMARY KEY ("routineId","exerciseId")
 );
 
 -- CreateIndex
@@ -104,4 +110,7 @@ ALTER TABLE "Payment" ADD CONSTRAINT "Payment_memberId_fkey" FOREIGN KEY ("membe
 ALTER TABLE "Appointment" ADD CONSTRAINT "Appointment_memberId_fkey" FOREIGN KEY ("memberId") REFERENCES "Member"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Routine" ADD CONSTRAINT "Routine_exerciseId_fkey" FOREIGN KEY ("exerciseId") REFERENCES "Exercise"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "RoutineExercise" ADD CONSTRAINT "RoutineExercise_routineId_fkey" FOREIGN KEY ("routineId") REFERENCES "Routine"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "RoutineExercise" ADD CONSTRAINT "RoutineExercise_exerciseId_fkey" FOREIGN KEY ("exerciseId") REFERENCES "Exercise"("id") ON DELETE CASCADE ON UPDATE CASCADE;
