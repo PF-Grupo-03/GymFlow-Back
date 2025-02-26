@@ -94,14 +94,23 @@ model Exercise {
   repetitions Int
   category   String
   gifUrl     String?
-  routines   Routine[]
+  routines   RoutineExercise[]
 }
 
 model Routine {
   id          String @id @default(uuid())
   day         String
-  category    String
-  exerciseId  String
+  categories    String[]
+  exercises   RoutineExercise[]
+}
 
-  exercise Exercise @relation(fields: [exerciseId], references: [id])
+model RoutineExercise {
+  routineId String
+  exerciseId String
+
+  routine Routine @relation(fields: [routineId], references: [id], onDelete: Cascade)
+
+  exercise Exercise @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+
+  @@id([routineId, exerciseId])
 }
