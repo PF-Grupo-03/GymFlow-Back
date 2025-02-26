@@ -93,7 +93,7 @@ model Exercise {
   series      Int
   repetitions Int
   category   String
-  gifUrl     String
+  gifUrl     String?
   routines   RoutineExercise[]
 }
 
