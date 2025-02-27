@@ -17,12 +17,15 @@ enum UserRole {
   USER_MEMBER
   USER_TRAINING
   USER_ADMIN
+  USER_BASIC
+  USER_PREMIUM
+  USER_DIAMOND
 }
 
 enum MemberShipType {
   BASIC
   PREMIUM
-  DIAMONT
+  DIAMOND
 }
 
 model Users {
@@ -52,11 +55,12 @@ model Member {
   user Users @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   memberShipType MemberShipType
+   isActive       Boolean @default(false)
 
   startDate DateTime @default(now())
   endDate   DateTime
 
-  payment      Payment[]
+  payments      Payment[]
   appointments Appointment[] // Relación con Appointment
 
   createdAt DateTime @default(now())
@@ -70,6 +74,7 @@ model Payment {
   member Member @relation(fields: [memberId], references: [id])
 
   amount      Float
+  status      String   @default("PENDING")
   PaymentDate DateTime @default(now())
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -81,7 +86,7 @@ model Appointment {
   member   Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
 
   date   DateTime
-  status String   @default("PENDING") // Estado de la cita (ej: PENDING, CONFIRMED, CANCELED)
+  status String   @default("ACTIVED") // Estado de la cita (ej: PENDING, CONFIRMED, CANCELED)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
