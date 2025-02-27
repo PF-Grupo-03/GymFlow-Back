@@ -2,40 +2,75 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, ForbiddenException }
 import { AppointmentsService } from "./appointments.service"
 import { CreateAppointmentsDto } from './appointments.dto';
 import { PrismaService } from 'src/prisma.service';
+import { UpdateAppointmentStatusDto } from './update-appointment.dto';
 
 
 @Controller('appointments')
 export class AppointmentsController {
-  constructor(private readonly appointmentsService: AppointmentsService, private readonly prisma: PrismaService) {}
+  constructor(private readonly appointmentsService: AppointmentsService) {}
 
   @Post()
   async createAppointment(@Body() createAppointmentDto: CreateAppointmentsDto) {
-    const member = await this.prisma.member.findUnique({
-      where: { id: createAppointmentDto.memberId },
-    });
-  
-    if (!member || !member.isActive) {
-      throw new ForbiddenException('Debes tener una membresía activa para agendar una cita.');
-    }
-  
     return this.appointmentsService.createAppointment(createAppointmentDto);
   }
 
-  @Get()
-  findAll() {
-    return this.appointmentsService.findAll();
+  @Get(':memberId')
+  findAll(@Param('memberId') memberId: string) {
+    return this.appointmentsService.findAll(memberId);
   }
 
-  @Get(':id')
+  @Get('appointment/:id')
   findOne(@Param('id') id: string) {
     return this.appointmentsService.findOne(id);
   }
 
   @Patch(':id/status')
-  async updateAppointmentStatus(
-    @Param('id') id: string,
-    @Body('status') status: string,
-  ) {
-    return this.appointmentsService.updateAppointmentStatus(id, status);
+  updateAppointmentStatus(@Param('id') id: string, @Body() updateAppointmentStatusDto: UpdateAppointmentStatusDto) {
+    return this.appointmentsService.updateAppointmentStatus(id, updateAppointmentStatusDto.status);
   }
 }
+
+
+
+
+
+
+
+
+
+
+// @Controller('appointments')
+// export class AppointmentsController {
+//   constructor(private readonly appointmentsService: AppointmentsService, private readonly prisma: PrismaService) {}
+
+//   @Post()
+//   async createAppointment(@Body() createAppointmentDto: CreateAppointmentsDto) {
+//     const member = await this.prisma.member.findUnique({
+//       where: { id: createAppointmentDto.memberId },
+//     });
+  
+//     if (!member || !member.isActive) {
+//       throw new ForbiddenException('Debes tener una membresía activa para agendar una cita.');
+//     }
+  
+//     return this.appointmentsService.createAppointment(createAppointmentDto);
+//   }
+
+//   @Get()
+//   findAll() {
+//     return this.appointmentsService.findAll();
+//   }
+
+//   @Get(':id')
+//   findOne(@Param('id') id: string) {
+//     return this.appointmentsService.findOne(id);
+//   }
+
+//   @Patch(':id/status')
+//   async updateAppointmentStatus(
+//     @Param('id') id: string,
+//     @Body('status') status: string,
+//   ) {
+//     return this.appointmentsService.updateAppointmentStatus(id, status);
+//   }
+// }
