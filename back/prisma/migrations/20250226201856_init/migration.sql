@@ -1,8 +1,8 @@
 -- CreateEnum
-CREATE TYPE "UserRole" AS ENUM ('USER_MEMBER', 'USER_TRAINING', 'USER_ADMIN');
+CREATE TYPE "UserRole" AS ENUM ('USER_MEMBER', 'USER_TRAINING', 'USER_ADMIN', 'USER_BASIC', 'USER_PREMIUM', 'USER_DIAMOND');
 
 -- CreateEnum
-CREATE TYPE "MemberShipType" AS ENUM ('BASIC', 'PREMIUM', 'DIAMONT');
+CREATE TYPE "MemberShipType" AS ENUM ('BASIC', 'PREMIUM', 'DIAMOND');
 
 -- CreateTable
 CREATE TABLE "Users" (
@@ -27,6 +27,7 @@ CREATE TABLE "Member" (
     "id" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
     "memberShipType" "MemberShipType" NOT NULL,
+    "isActive" BOOLEAN NOT NULL DEFAULT false,
     "startDate" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "endDate" TIMESTAMP(3) NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -40,6 +41,7 @@ CREATE TABLE "Payment" (
     "id" TEXT NOT NULL,
     "memberId" TEXT NOT NULL,
     "amount" DOUBLE PRECISION NOT NULL,
+    "status" TEXT NOT NULL DEFAULT 'PENDING',
     "PaymentDate" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -66,7 +68,7 @@ CREATE TABLE "Exercise" (
     "series" INTEGER NOT NULL,
     "repetitions" INTEGER NOT NULL,
     "category" TEXT NOT NULL,
-    "gifUrl" TEXT NOT NULL,
+    "gifUrl" TEXT,
 
     CONSTRAINT "Exercise_pkey" PRIMARY KEY ("id")
 );
