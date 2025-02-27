@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { CreateAppointmentsDto } from './appointments.dto';
 
@@ -7,7 +7,7 @@ import { CreateAppointmentsDto } from './appointments.dto';
 export class AppointmentsService {
     constructor(private readonly prisma: PrismaService) {}
 
-    async create(data: CreateAppointmentsDto) {
+    async createAppointment(data: CreateAppointmentsDto) {
         return this.prisma.appointment.create({
           data,
           include: { member: { include: { user: true } } }, // Incluir datos del usuario a través del miembro
@@ -29,7 +29,27 @@ export class AppointmentsService {
         return appointment;
       }
 
-      async remove(id: string) {
-        return this.prisma.appointment.delete({ where: { id } });
+      async updateAppointmentStatus(id: string, status: string) {
+        // Lista de estados válidos
+        const validStatuses = ['ACTIVED', 'CANCELED'];
+    
+        if (!validStatuses.includes(status)) {
+          throw new BadRequestException('Estado no válido.');
+        }
+    
+        // Buscar la cita por ID
+        const appointment = await this.prisma.appointment.findUnique({
+          where: { id },
+        });
+    
+        if (!appointment) {
+          throw new NotFoundException('Cita no encontrada.');
+        }
+    
+        // Actualizar el estado de la cita
+        return this.prisma.appointment.update({
+          where: { id },
+          data: { status },
+        });
       }
 }
