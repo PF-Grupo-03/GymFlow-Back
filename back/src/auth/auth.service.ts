@@ -9,6 +9,7 @@ import { UsersService } from 'src/users/users.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { Users } from '@prisma/client';
+import { UserRole } from 'src/roles.enum';
 
 @Injectable()
 export class AuthService {
@@ -18,33 +19,39 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async signup( user: Omit<Users, 'id' | 'createdAt' | 'updatedAt' | 'approved'>) {
-
-    const existingUserDni = await this.prisma.users.findUnique({ where: { dni: user.dni } });
+  async signup(
+    user: Omit<Users, 'id' | 'createdAt' | 'updatedAt' | 'approved'>,
+  ) {
+    user.email = user.email.toLowerCase();
+    const existingUserDni = await this.prisma.users.findUnique({
+      where: { dni: user.dni },
+    });
     if (existingUserDni) {
       throw new BadRequestException('El DNI ya está registrado');
     }
 
-      
-    const existingUserPhone = await this.prisma.users.findUnique({ where: { phone: user.phone } });
+    const existingUserPhone = await this.prisma.users.findUnique({
+      where: { phone: user.phone },
+    });
     if (existingUserPhone) {
       throw new BadRequestException('El teléfono ya está registrado');
     }
 
     const existingUser = await this.userService.findUserByEmail(user.email);
-    
+
     if (existingUser) {
       throw new BadRequestException('El email ya está registrado');
     }
 
     // Hasheamos la contraseña y creamos el nuevo usuario.
     const hashPassword = await bcrypt.hash(user.password, 10);
-    
+
     // Asignamos el rol y el estado de aprobación.
-    const role = user.role === 'USER_TRAINING' ? 'USER_TRAINING' : 'USER_MEMBER';
+    const role =
+      user.role === 'USER_TRAINING' ? 'USER_TRAINING' : 'USER_MEMBER';
     const approved = role === 'USER_MEMBER';
 
-    const saveUser = await this.prisma.users.create({ 
+    const saveUser = await this.prisma.users.create({
       data: {
         ...user,
         dni: user.dni,
@@ -60,66 +67,94 @@ export class AuthService {
         phone: true,
         role: true,
         approved: true,
-      }
+      },
     });
 
     // const { password, ...userWithoutPassword } = saveUser;
 
     if (!saveUser.approved) {
       return {
-        messege: "Tu solicitud fue enviada. Un administrador de aprobar tu cuenta.",
-        user: saveUser
-      }
+        messege:
+          'Tu solicitud fue enviada. Un administrador de aprobar tu cuenta.',
+        user: saveUser,
+      };
     }
 
     // Generamos el token de autenticación.
     const payload = {
       id: saveUser.id,
       email: saveUser.email,
-      role: saveUser.role
+      role: saveUser.role,
     };
     const token = this.jwtService.sign(payload);
 
     return {
-      user: saveUser, 
-      token
+      user: saveUser,
+      token,
     };
   }
-        
-        
-  async signin( email: string, passwordLoggin: string ) {
-    
+
+  async signin(email: string, passwordLoggin: string) {
     const user = await this.prisma.users.findUnique({
       where: { email: email.toLowerCase() },
     });
     if (!user) {
-    throw new UnauthorizedException('Credenciales inválidas');
+      throw new UnauthorizedException('Credenciales inválidas');
     }
 
-
     if (!user.approved) {
-      throw new ForbiddenException('Tu cuenta aún no fue aprobada por un administrador');
+      throw new ForbiddenException(
+        'Tu cuenta aún no fue aprobada por un administrador',
+      );
     }
 
     const passwordMatch = await bcrypt.compare(passwordLoggin, user.password);
     if (!passwordMatch) {
-    throw new UnauthorizedException('Credenciales inválidas');
+      throw new UnauthorizedException('Credenciales inválidas');
     }
-      
+
     const payload = {
       id: user.id,
       email: user.email,
       role: user.role,
     };
-  
+
     const token = this.jwtService.sign(payload);
 
-    const {password, role, ...withoutPasswordAndRole} = user;
-    
+    const { password, role, ...withoutPasswordAndRole } = user;
+
     return {
       withoutPasswordAndRole,
-      token
+      token,
     };
-      
+  }
+  async validateOrCreateGoogleUser(profile: any) {
+    let user = await this.prisma.users.findUnique({
+      where: { email: profile.emails[0].value.toLowerCase() },
+    });
+
+    if (!user) {
+      user = await this.prisma.users.create({
+        data: {
+          email: profile.emails[0].value.toLowerCase(),
+          nameAndLastName: profile.displayName,
+          role: UserRole.USER_MEMBER, // Asignar rol por defecto
+          dni: '',
+          password: '',
+          bDate: new Date(),
+          address: '',
+          phone: '',
+        },
+      });
+    }
+
+    return this.generateToken(user);
+  }
+
+  async generateToken(user: Users) {
+    const payload = { sub: user.id, email: user.email, role: user.role };
+    return {
+      accessToken: this.jwtService.sign(payload, { expiresIn: '15m' }),
+    };
   }
 }
