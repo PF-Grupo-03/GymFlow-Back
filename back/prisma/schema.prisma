@@ -85,7 +85,9 @@ model Appointment {
   memberId String
   member   Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
 
-  date   DateTime
+  date   String
+  time   String
+
   status String   @default("ACTIVED") // Estado de la cita (ej: PENDING, CONFIRMED, CANCELED)
 
   createdAt DateTime @default(now())
