@@ -15,7 +15,7 @@ import {
   Validate,
 } from 'class-validator';
 import { MemberShipType, UserRole } from 'src/roles.enum';
-import { MatchPassword } from 'src/Utils/matchPassword';
+import { MatchPassword } from 'src/utils/matchPassword';
 
 export class CreateUserDto {
   @ApiProperty({ example: 'Juan Pérez' })
