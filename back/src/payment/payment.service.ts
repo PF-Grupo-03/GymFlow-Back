@@ -32,6 +32,7 @@ export class PaymentService {
       if (response.status !== 'approved') {
         throw new BadRequestException('El pago no fue aprobado');
       }
+      
 
       // Buscar el usuario en la base de datos
       const user = await this.prisma.users.findUnique({
@@ -41,6 +42,11 @@ export class PaymentService {
 
       if (!user) {
         throw new BadRequestException('Usuario no encontrado.');
+      }
+
+      // Verificar si el usuario tiene una membresía activa y no vencida
+      if (user.member && user.member.isActive && new Date(user.member.endDate) > new Date()) {
+      throw new BadRequestException('Ya tienes una membresía activa. No puedes pagar otra hasta que expire.');
       }
 
       // Determinar el tipo de membresía en base al monto pagado
