@@ -4,6 +4,8 @@ import { CreatePaymentDto } from './payment.dto';
 import { PrismaService } from 'src/prisma.service';
 import { MemberShipType, UserRole } from "@prisma/client";
 import { addMonths } from 'date-fns';
+import axios from 'axios';
+
 
 @Injectable()
 export class PaymentService {
@@ -100,7 +102,7 @@ export class PaymentService {
       });
 
       // Guardar el pago en la base de datos
-      const newPayment = await this.prisma.payment.create({
+      await this.prisma.payment.create({
         data: {
           memberId: member.id,
           amount: createPaymentDto.transactionAmount,
@@ -111,6 +113,46 @@ export class PaymentService {
     } catch (error) {
       console.error('Error al procesar el pago:', error);
       throw new BadRequestException(`Error de pago: ${error.message || error.response?.message || 'No se pudo procesar el pago.'}`);
+    }
+  }
+
+
+  async processWebhook(data: any) {
+    const { id, type } = data;
+
+    if (!id || !type) {
+      console.warn('⚠️ Webhook recibido sin ID o tipo');
+      return;
+    }
+
+    console.log(`📌 Webhook de Mercado Pago recibido - Tipo: ${type}, ID: ${id}`);
+
+    // Si el Webhook es sobre un pago, obtener detalles desde la API de Mercado Pago
+    if (type === 'payment') {
+      const paymentInfo = await this.getPaymentInfo(id);
+      console.log('✅ Información del pago:', paymentInfo);
+
+    }
+  }
+
+  async getPaymentInfo(paymentId: string) {
+    const MERCADOPAGO_ACCESS_TOKEN = process.env.MERCADOPAGO_ACCESS_TOKEN;
+
+    if (!MERCADOPAGO_ACCESS_TOKEN) {
+      console.error('❌ ERROR: No se configuró MERCADOPAGO_ACCESS_TOKEN en las variables de entorno');
+      return;
+    }
+
+    try {
+      const response = await axios.get(`https://api.mercadopago.com/v1/payments/${paymentId}`, {
+        headers: {
+          Authorization: `Bearer ${MERCADOPAGO_ACCESS_TOKEN}`,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error('❌ Error obteniendo información del pago:', error.response?.data || error.message);
+      return null;
     }
   }
 }
