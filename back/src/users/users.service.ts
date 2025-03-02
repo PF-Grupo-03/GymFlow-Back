@@ -12,7 +12,7 @@ import { ApproveTrainerDto } from './dtos/approveTrainer.dto';
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
-  private excludePassword(user: CreateUserDto) {
+  private excludePassword(user: any) {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, confirmPassword, ...userWithoutPassword } = user;
     return userWithoutPassword;
@@ -20,11 +20,10 @@ export class UsersService {
 
   async getAllUsers() {
     const users = await this.prisma.users.findMany();
-    
 
     if (!users.length) throw new NotFoundException('Usuarios no encontrados');
 
-    const userMap = users.map( (user) => this.excludePassword);
+    const userMap = users.map((user) => this.excludePassword(user));
     return userMap;
   }
 
@@ -32,7 +31,7 @@ export class UsersService {
     const user = await this.prisma.users.findUnique({
       where: {
         id: id,
-      }
+      },
     });
 
     if (!user) throw new NotFoundException('Usuario no encontrado');
@@ -50,8 +49,7 @@ export class UsersService {
       });
 
       const { password, ...userWithoutPassword } = user;
-    return userWithoutPassword
-
+      return userWithoutPassword;
     } catch (error) {
       if (error.code === 'P2025') {
         throw new NotFoundException(`El usuario con ID ${id} no existe`);
