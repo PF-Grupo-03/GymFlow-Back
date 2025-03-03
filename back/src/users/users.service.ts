@@ -7,6 +7,7 @@ import {
 import { PrismaService } from 'src/prisma.service';
 import { CreateUserDto } from './dtos/users.dto';
 import { ApproveTrainerDto } from './dtos/approveTrainer.dto';
+import { UpdateUserDto } from './dtos/updateUser.dto';
 
 @Injectable()
 export class UsersService {
@@ -83,4 +84,40 @@ export class UsersService {
       data: { approved: dto.approved },
     });
   }
+
+  async updateUserAuthGoogle(id: string, updatedData: Partial<UpdateUserDto>) {
+    try {
+      // Obtener el usuario actual
+      const user = await this.prisma.users.findUnique({ where: { id } });
+  
+      if (!user) {
+        throw new NotFoundException(`El usuario con ID ${id} no existe`);
+      }
+  
+      // Verificar si los datos están completos
+      const hasAllRequiredFields =
+        (updatedData.dni || user.dni) &&
+        (updatedData.address || user.address) &&
+        (updatedData.phone || user.phone);
+  
+      // Si todos los datos están completos, marcar como aprobado
+      const updatedUser = await this.prisma.users.update({
+        where: { id },
+        data: {
+          ...updatedData,
+          approved: hasAllRequiredFields ? true : user.approved, // Solo cambia approved si están los datos completos
+        },
+      });
+  
+      const { password, ...userWithoutPassword } = updatedUser;
+      return userWithoutPassword;
+      
+    } catch (error) {
+      if (error.code === 'P2025') {
+        throw new NotFoundException(`El usuario con ID ${id} no existe`);
+      }
+      throw new InternalServerErrorException('Error al actualizar el usuario');
+    }
+  }
+  
 }

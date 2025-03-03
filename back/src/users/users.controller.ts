@@ -13,6 +13,7 @@ import { RolesGuard } from 'src/auth/guards/roles.guards';
 import { CreateUserDto } from './dtos/users.dto';
 import { ApproveTrainerDto } from './dtos/approveTrainer.dto';
 import { UserRole } from 'src/roles.enum';
+import { UpdateUserDto } from './dtos/updateUser.dto';
 
 @Controller('users')
 export class UsersController {
@@ -26,7 +27,7 @@ export class UsersController {
     return this.usersService.getUserById(id);
   }
 
-  @Put(':id')
+  @Put('update-user/:id')
   updateUser(@Param('id') id: string, @Body() user: CreateUserDto) {
     return this.usersService.updateUser(id, user);
   }
@@ -42,4 +43,10 @@ export class UsersController {
   approveTrainer(@Param('id') id: string, @Body() dto: ApproveTrainerDto) {
     return this.usersService.approveTrainer(id, dto);
   }
+
+  @Put('update-google/:id')
+  updateUserAuthGoogle(@Param('id') id: string, @Body() user: UpdateUserDto) {
+  return this.usersService.updateUser(id, user);
+}
+
 }
