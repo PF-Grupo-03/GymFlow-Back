@@ -38,7 +38,7 @@ async function bootstrap() {
   );
 
   const port = process.env.PORT || 3001; // Usamos el puerto de Render o 3001 en local
-  console.log('Render PORT:', process.env.PORT);
+  console.log('Render PORT:', port);
 
   await app.listen(port, () => {
     console.log(`🚀 Servidor corriendo en el puerto ${port}`);
