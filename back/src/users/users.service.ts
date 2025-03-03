@@ -61,7 +61,6 @@ export class UsersService {
     const user = await this.prisma.users.findUnique({
       where: { email },
     });
-    if (!user) throw new NotFoundException('Usuario no encontrado');
     return user;
   }
 
