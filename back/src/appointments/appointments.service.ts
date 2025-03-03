@@ -1,28 +1,90 @@
-import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { CreateAppointmentsDto } from './appointments.dto';
-
 
 @Injectable()
 export class AppointmentsService {
   constructor(private readonly prisma: PrismaService) {}
 
   async createAppointment(data: CreateAppointmentsDto) {
+    const { memberId, date, time } = data;
     // Verificar si el usuario tiene una membresía activa
     const member = await this.prisma.member.findUnique({
       where: { id: data.memberId },
     });
 
     if (!member || !member.isActive) {
-      throw new ForbiddenException('Debes tener una membresía activa para agendar una cita.');
+      throw new ForbiddenException(
+        'Debes tener una membresía activa para agendar una cita.',
+      );
+    }
+    const membershipType = member.memberShipType;
+
+    // Validar que la fecha esté dentro de los próximos 7 días
+    const appointmentDate = new Date(data.date);
+    const today = new Date();
+    const maxDate = new Date();
+    maxDate.setDate(today.getDate() + 7);
+
+    if (appointmentDate < today || appointmentDate > maxDate) {
+      throw new BadRequestException(
+        'Solo puedes agendar turnos dentro de los próximos 7 días.',
+      );
     }
 
-  //   // Convertir `date` de string a DateTime
-  //   const appointmentDate = new Date(data.date);
-  //   if (isNaN(appointmentDate.getTime())) {
-  //   throw new BadRequestException('Fecha inválida, asegúrate de enviarla en formato ISO-8601.');
-  // }
+    // Validar horarios según la membresía
+    const hour = parseInt(time.split(':')[0]);
+    if (membershipType === 'BASIC' && (hour < 8 || hour > 18)) {
+      throw new BadRequestException(
+        'Los usuarios BASIC solo pueden reservar entre 08:00 y 18:00.',
+      );
+    }
 
+    // Validar que el usuario no tenga más turnos de los permitidos
+    const existingAppointments = await this.prisma.appointment.findMany({
+      where: { memberId, date },
+    });
+
+    if (membershipType === 'BASIC' && existingAppointments.length >= 1) {
+      throw new BadRequestException(
+        'Los usuarios BASIC solo pueden tener un turno por día.',
+      );
+    }
+
+    // if (
+    //   (membershipType === 'PREMIUM' || membershipType === 'DIAMOND') &&
+    //   existingAppointments.some((a) => a.roomId === roomId)
+    // ) {
+    //   throw new BadRequestException(
+    //     'Ya tienes un turno en esta sala para este día.',
+    //   );
+    // }
+
+    // Convertir `date` de string a DateTime
+
+    // if (isNaN(appointmentDate.getTime())) {
+    //   throw new BadRequestException(
+    //     'Fecha inválida, asegúrate de enviarla en formato ISO-8601.',
+    //   );
+    // }
+    // Validar disponibilidad de la sala
+    // const roomAppointments = await this.prisma.appointment.count({
+    //   where: { roomId, date, time },
+    // });
+
+    // const room = await this.prisma.room.findUnique({ where: { id: roomId } });
+    // if (!room) {
+    //   throw new NotFoundException('Sala no encontrada.');
+    // }
+
+    // if (roomAppointments >= room.capacity) {
+    //   throw new BadRequestException('No hay más vacantes disponibles en esta sala para este horario.');
+    // }
     // Verificar que no haya un turno en la misma fecha y hora
     const existingAppointment = await this.prisma.appointment.findFirst({
       where: {
@@ -33,11 +95,13 @@ export class AppointmentsService {
     });
 
     if (existingAppointment) {
-      throw new BadRequestException('Ya tienes un turno agendado para esta fecha y hora.');
+      throw new BadRequestException(
+        'Ya tienes un turno agendado para esta fecha y hora.',
+      );
     }
 
     return this.prisma.appointment.create({
-      data,
+      data: { memberId, date, time },
       include: { member: { include: { user: true } } },
     });
   }
@@ -66,7 +130,9 @@ export class AppointmentsService {
       throw new BadRequestException('Estado no válido.');
     }
 
-    const appointment = await this.prisma.appointment.findUnique({ where: { id } });
+    const appointment = await this.prisma.appointment.findUnique({
+      where: { id },
+    });
 
     if (!appointment) {
       throw new NotFoundException('Cita no encontrada.');
