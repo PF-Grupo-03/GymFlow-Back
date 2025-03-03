@@ -44,9 +44,9 @@ export class UsersController {
     return this.usersService.approveTrainer(id, dto);
   }
 
-  @Put('update-google/:id')
+  @Patch('update-google/:id')
   updateUserAuthGoogle(@Param('id') id: string, @Body() user: UpdateUserDto) {
-  return this.usersService.updateUser(id, user);
+  return this.usersService.updateUserAuthGoogle(id, user);
 }
 
 }
