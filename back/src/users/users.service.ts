@@ -45,7 +45,6 @@ export class UsersService {
       const user = await this.prisma.users.update({
         where: { id },
         data: updatedData,
-        include: { member: true },
       });
 
       const { password, ...userWithoutPassword } = user;
@@ -59,10 +58,11 @@ export class UsersService {
   }
 
   async findUserByEmail(email: string) {
-    return await this.prisma.users.findUnique({
+    const user = await this.prisma.users.findUnique({
       where: { email },
-      include: { member: true },
     });
+    if (!user) throw new NotFoundException('Usuario no encontrado');
+    return user;
   }
 
   async approveTrainer(userId: string, dto: ApproveTrainerDto) {
