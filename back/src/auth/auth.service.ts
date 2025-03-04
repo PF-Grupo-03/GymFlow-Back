@@ -70,12 +70,12 @@ export class AuthService {
       },
     });
 
-    // const { password, ...userWithoutPassword } = saveUser;
+    
 
     if (!saveUser.approved) {
       return {
         messege:
-          'Tu solicitud fue enviada. Un administrador de aprobar tu cuenta.',
+          'Tu solicitud fue enviada. Un administrador debe aprobar tu cuenta.',
         user: saveUser,
       };
     }
