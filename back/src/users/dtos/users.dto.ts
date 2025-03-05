@@ -31,7 +31,6 @@ export class CreateUserDto {
   })
   dni: string;
 
-
   @ApiProperty({ example: 'juanperez@gmail.com' })
   @IsNotEmpty()
   @IsEmail()
@@ -80,4 +79,7 @@ export class CreateUserDto {
   @IsOptional()
   @IsEnum(MemberShipType)
   memberShipType?: MemberShipType;
+
+  @IsOptional()
+  googleAccessToken?: string;
 }

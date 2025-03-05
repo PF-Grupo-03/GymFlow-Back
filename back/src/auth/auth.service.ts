@@ -10,6 +10,7 @@ import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { Users } from '@prisma/client';
 import { UserRole } from 'src/roles.enum';
+import { GoogleDto } from './google.dto';
 
 @Injectable()
 export class AuthService {
@@ -20,7 +21,10 @@ export class AuthService {
   ) {}
 
   async signup(
-    user: Omit<Users, 'id' | 'createdAt' | 'updatedAt' | 'approved'>,
+    user: Omit<
+      Users,
+      'id' | 'createdAt' | 'updatedAt' | 'approved' | 'googleAccessToken'
+    >,
   ) {
     user.email = user.email.toLowerCase();
     const existingUserDni = await this.prisma.users.findUnique({
@@ -128,9 +132,10 @@ export class AuthService {
       token,
     };
   }
-  async validateOrCreateGoogleUser(profile: any) {
+  async validateOrCreateGoogleUser({ accessToken, profile }: GoogleDto) {
+    const email = profile.emails[0].value.toLowerCase();
     let user = await this.prisma.users.findUnique({
-      where: { email: profile.emails[0].value.toLowerCase() },
+      where: { email },
     });
 
     if (!user) {
@@ -138,13 +143,19 @@ export class AuthService {
         data: {
           email: profile.emails[0].value.toLowerCase(),
           nameAndLastName: profile.displayName,
-          role: UserRole.USER_MEMBER, // Asignar rol por defecto
+          role: UserRole.USER_MEMBER || UserRole.USER_TRAINING, // Asignar rol por defecto
           dni: '',
           password: '',
           bDate: new Date(),
           address: '',
           phone: '',
+          googleAccessToken: accessToken,
         },
+      });
+    } else {
+      user = await this.prisma.users.update({
+        where: { email },
+        data: { googleAccessToken: accessToken },
       });
     }
 
