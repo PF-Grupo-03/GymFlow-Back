@@ -37,6 +37,7 @@ model Users {
   bDate           DateTime
   address         String
   phone           String   @unique
+  googleAccessToken String?
 
   role UserRole @default(USER_MEMBER)
 
