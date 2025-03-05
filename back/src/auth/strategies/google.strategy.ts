@@ -4,6 +4,7 @@ import { Strategy, VerifyCallback } from 'passport-google-oauth20';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../../prisma.service';
 import { UserRole } from 'src/roles.enum';
+import { User } from 'mercadopago';
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
@@ -42,7 +43,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
         data: {
           email: email,
           nameAndLastName: `${profile.name.givenName} ${profile.name.familyName}`,
-          role: UserRole.USER_MEMBER,
+          role: UserRole.USER_MEMBER || UserRole.USER_TRAINING,
           dni: '', // Valor por defecto
           password: '', // No se usa, pero es obligatorio
           bDate: new Date(), // O una fecha predeterminada

@@ -11,6 +11,7 @@ import { AuthService } from './auth.service';
 import { CreateUserDto } from '../users/dtos/users.dto';
 import { loginUserDto } from 'src/users/dtos/login.dto';
 import { AuthGuard } from '@nestjs/passport';
+import { GoogleDto } from './google.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -43,15 +44,15 @@ export class AuthController {
 
   @Get('google')
   @UseGuards(AuthGuard('google'))
-  async googleAuth() {
-    // Este endpoint redirige al usuario a Google
+  async googleAuth(googleDto: GoogleDto) {
+    return this.authService.validateOrCreateGoogleUser(googleDto);
   }
 
   @Get('google/redirect')
   @UseGuards(AuthGuard('google'))
   googleAuthRedirect(@Req() req) {
     return {
-      message: 'User authenticated with Google',
+      message: 'Usuario registrado correctamente',
       user: req.user,
     };
   }
