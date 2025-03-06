@@ -16,19 +16,20 @@ export class PaymentController {
 
   @Post('process')
   async processPayment(@Body() body: ProcessPaymentDto) {
-    this.logger.log(`Procesando pago con ID: ${body.paymentId}`);
-    return this.paymentService.processPayment(body.paymentId);
-  }
-
-  @Post('webhook')
-  async handleWebhook(@Body() body: any) {
-    this.logger.log(`📩 Webhook recibido: ${JSON.stringify(body)}`);
-    if (body.type === 'payment' && body.id) {
-      return this.paymentService.processPayment(body.id);
-    }
-    return { message: 'Webhook recibido, pero no procesado.' };
+    this.logger.log(`Procesando pago con ID: ${body.paymentId} para usuario: ${body.userEmail}`);
+    return this.paymentService.processPayment(body);
   }
 }
+
+  // @Post('webhook')
+  // async handleWebhook(@Body() body: any) {
+  //   this.logger.log(`📩 Webhook recibido: ${JSON.stringify(body)}`);
+  //   if (body.type === 'payment' && body.id) {
+  //     return this.paymentService.processPayment(body.id);
+  //   }
+  //   return { message: 'Webhook recibido, pero no procesado.' };
+  // }
+
 
 
 
