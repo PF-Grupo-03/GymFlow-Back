@@ -2,8 +2,8 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@n
 import { MembersService } from './members.service';
 import { AuthGuard } from 'src/guards/auth.guards';
 import { Roles } from 'src/decorators/roles.decorators';
-import { UserRole } from 'src/roles.enum';
-import { RolesGuard } from 'src/guards/roles.guards';
+import { UserRole } from "src/enum/roles.enum"
+import { RolesGuard } from 'src/auth/guards/roles.guards';
 
 
 @Controller('members')
