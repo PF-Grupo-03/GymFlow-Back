@@ -3,7 +3,7 @@ import { MembersService } from './members.service';
 import { AuthGuard } from 'src/guards/auth.guards';
 import { Roles } from 'src/decorators/roles.decorators';
 import { UserRole } from "src/enum/roles.enum"
-import { RolesGuard } from 'src/auth/guards/roles.guards';
+import { RolesGuard } from 'src/guards/roles.guards';
 
 
 @Controller('members')
