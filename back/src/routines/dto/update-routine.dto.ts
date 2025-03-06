@@ -1,20 +1,10 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsArray, ArrayNotEmpty, IsUUID, IsOptional } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsArray, ValidateNested } from 'class-validator';
+import { CreateRoutineExerciseDto } from './createRoutineExercise.dto';
 
 export class UpdateRoutineDto {
-  @IsOptional()
-  @IsString()
-  day?: string;
-
-  @ApiProperty({example: ['Pierna', 'Gluteo']})
-  @IsOptional()
   @IsArray()
-  @ArrayNotEmpty()
-  categories?: string[];
-
-  @IsOptional()
-  @IsArray()
-  @ArrayNotEmpty()
-  @IsUUID('4', { each: true }) // Valida que cada ID de ejercicio sea un UUID
-  exercises?: string[];
+  @ValidateNested({ each: true })
+  @Type(() => CreateRoutineExerciseDto)
+  exercises: CreateRoutineExerciseDto[];
 }

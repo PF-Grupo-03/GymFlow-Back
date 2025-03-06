@@ -14,7 +14,7 @@ import {
   MinLength,
   Validate,
 } from 'class-validator';
-import { MemberShipType, UserRole } from 'src/roles.enum';
+import { MemberShipType, UserRole } from 'src/enum/roles.enum';
 import { MatchPassword } from 'src/utils/matchPassword';
 
 export class CreateUserDto {
