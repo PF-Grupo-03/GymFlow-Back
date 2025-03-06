@@ -8,6 +8,7 @@ import { RoutinesModule } from './routines/routines.module';
 import { JwtModule } from '@nestjs/jwt';
 import { FileUploadModule } from './file-upload/file-upload.module';
 import { ConfigModule } from '@nestjs/config';
+import { ExerciseModule } from './exercise/exercise.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { ConfigModule } from '@nestjs/config';
     }),
     AuthModule,
     UsersModule, 
+    ExerciseModule,
     RoutinesModule, 
     MembersModule, 
     AppointmentsModule, 

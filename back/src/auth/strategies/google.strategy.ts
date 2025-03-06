@@ -3,7 +3,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, VerifyCallback } from 'passport-google-oauth20';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../../prisma.service';
-import { UserRole } from 'src/roles.enum';
+import { UserRole } from 'src/enum/roles.enum';
 import { User } from 'mercadopago';
 
 @Injectable()

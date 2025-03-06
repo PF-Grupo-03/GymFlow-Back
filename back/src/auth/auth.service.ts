@@ -9,7 +9,7 @@ import { UsersService } from 'src/users/users.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { Users } from '@prisma/client';
-import { UserRole } from 'src/roles.enum';
+import { UserRole } from 'src/enum/roles.enum';
 import { GoogleDto } from './google.dto';
 
 @Injectable()
