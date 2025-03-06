@@ -29,6 +29,21 @@ export class ProcessPaymentDto {
   @IsString()
   @IsNotEmpty()
   paymentId: string;
+
+  @ApiProperty({ example: "approved" })
+  @IsString()
+  @IsNotEmpty()
+  status: string;
+
+  @ApiProperty({ example: 30000 })
+  @IsNumber()
+  @IsNotEmpty()
+  amount: number;
+
+  @ApiProperty({ example: "usuario@email.com" })
+  @IsString()
+  @IsNotEmpty()
+  userEmail: string;
 }
 
 
