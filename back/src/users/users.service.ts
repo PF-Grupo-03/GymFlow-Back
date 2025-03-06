@@ -64,7 +64,10 @@ export class UsersService {
     const user = await this.prisma.users.findUnique({
       where: { email },
     });
-    return user;
+
+    const { password, ...userWithoutPassword } = user;
+
+    return userWithoutPassword;
   }
   
   async approveTrainer(userId: string, dto: ApproveTrainerDto) {
