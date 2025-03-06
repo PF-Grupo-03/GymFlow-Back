@@ -30,7 +30,7 @@ export class RoutinesService {
             data: {
                 day,
                 userId,
-                exercises: {
+                routines: {
                     create: exercises.map(e => ({
                         exercise: { connect: { id: e.exerciseId } },
                         series: e.series,
