@@ -24,7 +24,7 @@ export class ExerciseController {
     return this.exerciseService.getExerciseById(id);
     }
     
-    @Get(':muscle')
+    @Get('muscle/:muscle')
     async getExercisesByMuscle(
         @Param('muscle', new ParseEnumPipe(Musclues)) muscle: Musclues
     ) {
