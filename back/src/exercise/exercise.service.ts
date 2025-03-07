@@ -14,6 +14,12 @@ export class ExerciseService {
         if (!data.name || !data.musclue) {
             throw new BadRequestException('Todos los campos obligatorios deben estar completos.');
         }
+        const nameOfExercise = await this.prisma.exercise.findMany({
+            where: { name: data.name },
+        });
+        if (nameOfExercise.length) {
+            throw new BadRequestException(`El ejercicio con el nombre: ${data.name} ya existe.`);
+        }
         
         try {
             const newExercise = await this.prisma.exercise.create({
