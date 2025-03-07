@@ -7,10 +7,10 @@ import { UsersService } from 'src/users/users.service';
 export class MercadoPagoService {
   private readonly logger = new Logger(MercadoPagoService.name);
 
-  private readonly successURL = process.env.SUCCESS_PAYMENT_URL || 'localhost:3000/payment-success';
-  private readonly failureURL = process.env.FAILURE_PAYMENT_URL || 'localhost:3000/payment-failure';
-  private readonly pendingURL = process.env.PENDING_PAYMENT_URL || 'localhost:3000/payment-pending';
-  private readonly frontendURL = process.env.FRONTEND_URL || '';
+  private readonly successURL = process.env.SUCCESS_PAYMENT_URL || 'https://gym-flow-front.vercel.app/payment-success';
+  private readonly failureURL = process.env.FAILURE_PAYMENT_URL || 'https://gym-flow-front.vercel.app/payment-failure';
+  private readonly pendingURL = process.env.PENDING_PAYMENT_URL || 'https://gym-flow-front.vercel.app/payment-pending';
+  private readonly frontendURL = process.env.FRONTEND_URL || 'https://gym-flow-front.vercel.app';
 
   private client: MercadoPagoConfig;
 
