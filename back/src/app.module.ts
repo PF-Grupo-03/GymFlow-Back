@@ -10,6 +10,8 @@ import { FileUploadModule } from './file-upload/file-upload.module';
 import { ConfigModule } from '@nestjs/config';
 import { EmailService } from './email/email.service';
 import { EmailModule } from './email/email.module';
+import { ExerciseModule } from './exercise/exercise.module';
+
 
 @Module({
   imports: [
@@ -19,10 +21,11 @@ import { EmailModule } from './email/email.module';
       signOptions: { expiresIn: '1h' },
     }),
     AuthModule,
-    UsersModule,
-    RoutinesModule,
-    MembersModule,
-    AppointmentsModule,
+    UsersModule, 
+    ExerciseModule,
+    RoutinesModule, 
+    MembersModule, 
+    AppointmentsModule, 
     PaymentModule,
     FileUploadModule,
     PaymentModule,

@@ -33,6 +33,7 @@ export class UsersService {
       where: {
         id: id,
       },
+      include: { routines: { include: { routines: { include: { exercise: true } } } } },
     });
 
     if (!user) throw new NotFoundException('Usuario no encontrado');
@@ -62,7 +63,6 @@ export class UsersService {
     const user = await this.prisma.users.findUnique({
       where: { email },
     });
-
     return user;
   }
 

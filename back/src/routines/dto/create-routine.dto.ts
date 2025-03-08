@@ -1,19 +1,21 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsArray, ArrayNotEmpty, IsUUID } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsString, IsArray, IsEnum, IsNotEmpty, ValidateNested } from 'class-validator';
+import { DayOfWeek } from 'src/enum/day.enum';
+import { CreateRoutineExerciseDto } from './createRoutineExercise.dto';
 
 export class CreateRoutineDto {
-
-    @ApiProperty({example: 'Lunes'})
+    @ApiProperty({example: 'Lunes', enum: DayOfWeek})
+    @IsEnum(DayOfWeek)
+    @IsNotEmpty()
+    day: DayOfWeek;
+  
     @IsString()
-    day: string;
-
-    @ApiProperty({example: ['Pecho', 'Espalda', 'Abdomen']})
+    @IsNotEmpty()
+    userId: string;
+  
     @IsArray()
-    @ArrayNotEmpty()
-    categories: string[];
-
-    @IsArray()
-    @ArrayNotEmpty()
-    @IsUUID('4', { each: true }) // Valida que cada ID de ejercicio sea un UUID
-    exercises: string[];
-}
+    @ValidateNested({ each: true })
+    @Type(() => CreateRoutineExerciseDto)
+    exercises: CreateRoutineExerciseDto[];
+  }

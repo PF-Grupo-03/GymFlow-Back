@@ -9,10 +9,10 @@ import {
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { Roles } from 'src/decorators/roles.decorators';
-import { RolesGuard } from 'src/auth/guards/roles.guards';
+import { RolesGuard } from 'src/guards/roles.guards';
 import { CreateUserDto } from './dtos/users.dto';
 import { ApproveTrainerDto } from './dtos/approveTrainer.dto';
-import { UserRole } from 'src/roles.enum';
+import { UserRole } from 'src/enum/roles.enum';
 import { UpdateUserDto } from './dtos/updateUser.dto';
 
 @Controller('users')

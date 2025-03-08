@@ -19,7 +19,7 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document);
 
   app.enableCors({
-    origin: 'https://gym-flow-rho.vercel.app',
+    origin: 'https://gym-flow-front.vercel.app',
     methods: 'GET,PUT,PATCH,POST,DELETE',
     credentials: true,
   });

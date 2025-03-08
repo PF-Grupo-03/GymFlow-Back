@@ -28,15 +28,35 @@ enum MemberShipType {
   DIAMOND
 }
 
+enum DayOfWeek {
+  LUNES
+  MARTES
+  MIERCOLES
+  JUEVES
+  VIERNES
+  SABADO
+  DOMINGO
+}
+
+enum Musclues {
+  PECHO
+  ESPALDA
+  BICEPS
+  TRICEPS
+  HOMBROS
+  PIERNAS
+  CORE
+}
+
 model Users {
-  id              String   @id @default(uuid())
-  nameAndLastName String
-  dni             String   @unique
-  email           String   @unique
-  password        String
-  bDate           DateTime
-  address         String
-  phone           String   @unique
+  id                String   @id @default(uuid())
+  nameAndLastName   String
+  dni               String   @unique
+  email             String   @unique
+  password          String
+  bDate             DateTime
+  address           String
+  phone             String   @unique
   googleAccessToken String?
 
   role UserRole @default(USER_MEMBER)
@@ -44,6 +64,8 @@ model Users {
   approved Boolean @default(false)
 
   member Member?
+
+  routines Routine[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -56,12 +78,12 @@ model Member {
   user Users @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   memberShipType MemberShipType
-   isActive       Boolean @default(false)
+  isActive       Boolean        @default(false)
 
   startDate DateTime @default(now())
   endDate   DateTime
 
-  payments      Payment[]
+  payments     Payment[]
   appointments Appointment[] // Relación con Appointment
 
   createdAt DateTime @default(now())
@@ -86,41 +108,41 @@ model Appointment {
   memberId String
   member   Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
 
-  date   String
-  time   String
+  date String
+  time String
 
-  status String   @default("ACTIVED") // Estado de la cita (ej: PENDING, CONFIRMED, CANCELED)
+  status String @default("ACTIVED") // Estado de la cita (ej: PENDING, CONFIRMED, CANCELED)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Exercise {
-  id         String    @id @default(uuid())
-  name        String
-  series      Int
-  repetitions Int
-  category   String
-  gifUrl     String?
-  routines   RoutineExercise[]
+  id       String            @id @default(uuid())
+  name     String
+  musclue  Musclues
+  gifUrl   String?
+  routines RoutineExercise[]
 }
 
 model Routine {
-  id          String @id @default(uuid())
-  day         String
-  categories    String[]
-  exercises   RoutineExercise[]
+  id       String            @id @default(uuid())
+  day      DayOfWeek
+  user     Users             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId   String
+  routines RoutineExercise[]
 }
 
 model RoutineExercise {
+  id String @id @default(uuid())
+
+  routine   Routine @relation(fields: [routineId], references: [id])
   routineId String
-  exerciseId String
 
-  routine Routine @relation(fields: [routineId], references: [id], onDelete: Cascade)
-
-  exercise Exercise @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
-
-  @@id([routineId, exerciseId])
+  exercise    Exercise @relation(fields: [exerciseId], references: [id])
+  exerciseId  String
+  series      Int
+  repetitions Int
 }
 model EmailLog {
   id         String   @id @default(uuid()) 
