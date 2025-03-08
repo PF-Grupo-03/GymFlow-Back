@@ -41,8 +41,6 @@ export class UsersService {
     return userWithoutPassword;
   }
 
-  
-  
   async updateUser(id: string, updatedData: Partial<CreateUserDto>) {
     try {
       const user = await this.prisma.users.update({
@@ -59,14 +57,15 @@ export class UsersService {
       throw new InternalServerErrorException('Error al actualizar el usuario');
     }
   }
-  
+
   async findUserByEmail(email: string) {
     const user = await this.prisma.users.findUnique({
       where: { email },
     });
+
     return user;
   }
-  
+
   async approveTrainer(userId: string, dto: ApproveTrainerDto) {
     const user = await this.prisma.users.findUnique({ where: { id: userId } });
 
@@ -86,52 +85,46 @@ export class UsersService {
     });
   }
 
-
   async updateUserAuthGoogle(id: string, updatedData: Partial<UpdateUserDto>) {
-    
     try {
       const user = await this.prisma.users.findUnique({ where: { id } });
-  
+
       if (!user) {
         throw new NotFoundException(`El usuario con ID ${id} no existe`);
       }
-    
-      // Verificar si otro usuario ya tiene el mismo número de teléfono
+
       if (updatedData.phone && updatedData.phone !== user.phone) {
         const existingPhoneUser = await this.prisma.users.findFirst({
           where: {
             phone: updatedData.phone,
-            id: { not: id }, // Excluir el usuario actual
+            id: { not: id },
           },
         });
-  
+
         if (existingPhoneUser) {
           throw new BadRequestException(
-            `El teléfono ${updatedData.phone} ya está en uso por otro usuario`
+            `El teléfono ${updatedData.phone} ya está en uso por otro usuario`,
           );
         }
       }
-  
+
       const updatedUser = await this.prisma.users.update({
         where: { id },
         data: {
           ...updatedData,
-          approved: true, // Asegurar que el usuario quede aprobado
+          approved: true,
         },
       });
-  
+
       const { password, ...userWithoutPassword } = updatedUser;
       return userWithoutPassword;
-    
     } catch (error) {
-      
       if (error instanceof BadRequestException) {
-        throw error; // Si es un error esperado, lo dejamos pasar tal cual
-      }  
-      throw new InternalServerErrorException('Error inesperado al actualizar el usuario');
+        throw error;
+      }
+      throw new InternalServerErrorException(
+        'Error inesperado al actualizar el usuario',
+      );
     }
   }
-  
-  
-  
 }
