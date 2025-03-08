@@ -2,7 +2,7 @@ import { Body, Controller, Delete, Get, Param, ParseEnumPipe, Post, Put } from "
 import { ExerciseService } from "./exercise.service";
 import { CreateExerciseDto } from "./dto/create-exercise.dto";
 import { UpdateExerciseDto } from "./dto/update-exercise.dto";
-import { Musclues } from "src/enum/musclues.enum";
+import { Musclues } from "@prisma/client";
 
 @Controller('exercise')
 export class ExerciseController {
@@ -39,5 +39,10 @@ export class ExerciseController {
     @Delete(':id')
     async deleteExercise(@Param('id') id: string) {
     return this.exerciseService.deleteExercise(id);
+    }
+
+    @Post('sync')
+    async syncExercises() {
+        return this.exerciseService.syncExercisesFromApi();
     }
 }

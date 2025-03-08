@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
+import { Musclues } from "@prisma/client";
 import { IsEnum, IsNotEmpty, IsOptional, IsString, IsUrl } from "class-validator";
-import { Musclues } from "src/enum/musclues.enum";
 
 export class UpdateExerciseDto {
     @ApiProperty({example: 'Press de banca con mancuernas'})
