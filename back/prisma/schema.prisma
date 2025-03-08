@@ -144,3 +144,12 @@ model RoutineExercise {
   series      Int
   repetitions Int
 }
+model EmailLog {
+  id         String   @id @default(uuid()) 
+  to         String
+  subject    String
+  content    String
+  eventType  String? 
+  messageId  String?  
+  sentAt     DateTime @default(now())
+}
