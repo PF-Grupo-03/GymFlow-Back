@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
+import { Musclues } from "@prisma/client";
 import { IsArray, IsEnum, IsInt, IsNotEmpty, IsNumber, IsOptional, IsPositive, IsString, IsUrl, Max, Min } from "class-validator";
-import { Musclues } from "src/enum/musclues.enum";
 
 export class CreateExerciseDto {
 
