@@ -107,6 +107,7 @@ export class ExerciseService {
                 target: "es",
                 format: "text"
             });
+            console.log("Texto original:", text, " - Traducido:", response.data.translatedText);
             return response.data.translatedText;
         }catch (error) {
             console.error("Error al traducir con LibreTranslate:", error);
@@ -118,31 +119,61 @@ export class ExerciseService {
 
     // Funcion para integrar la traducción a la funcion de sincronización de ejercicios.----------------------------------------------------
     async translateExerciseData(exercise: any): Promise<any> {
-        // Traducimos cada campo de tipo "string" usando "LibreTranslate"
+        // Traduce otros campos usando LibreTranslate
         const translatedName = await this.translateTextLibre(exercise.name);
-        const translatedBodyPart = await this.translateTextLibre(exercise.bodyPart);
         const translatedEquipment = await this.translateTextLibre(exercise.equipment);
         const translatedTarget = await this.translateTextLibre(exercise.target);
       
-        // Traducimos cada elemento de los arreglos (si existen)
+        // Diccionario que mapea el bodyPart en "inglés" al valor del enum en "español".
+        const muscluesMap: Record<string, Musclues> = {
+          "chest": Musclues.PECHO,
+          "back": Musclues.ESPALDA,
+          "biceps": Musclues.BICEPS,
+          "triceps": Musclues.TRICEPS,
+          "shoulders": Musclues.HOMBROS,
+          "core": Musclues.CORE,
+          "cardio": Musclues.CARDIO,
+          "upper arms": Musclues.BRAZOS_SUPERIORES,
+          "lower arms": Musclues.BRAZOS_INFERIORES,
+          "upper legs": Musclues.PIERNAS_SUPERIORES,
+          "lower legs": Musclues.PIERNAS_INFERIORES,
+          "neck": Musclues.CUELLO,
+          "waist": Musclues.CINTURA,
+        };
+      
+        // Verificamos y mapeamos el bodyPart recibido.
+        let mappedMuscle: Musclues;
+        if (!exercise.bodyPart) {
+          throw new BadRequestException(`El ejercicio ${exercise.name} no tiene definido el campo 'bodyPart'.`);
+        } else {
+          const muscleKey = exercise.bodyPart.toLowerCase();
+          if (muscluesMap[muscleKey]) {
+            mappedMuscle = muscluesMap[muscleKey];
+          } else {
+            throw new BadRequestException(`Valor no reconocido para bodyPart: ${exercise.bodyPart} en el ejercicio ${exercise.name}.`);
+          }
+        }
+      
+        // Traducimos los arreglos (si es que existen)
         const translatedSecondaryMuscles = exercise.secondaryMuscles && Array.isArray(exercise.secondaryMuscles)
-            ? await Promise.all(exercise.secondaryMuscles.map((muscle: string) => this.translateTextLibre(muscle)))
-        : [];
-        
+          ? await Promise.all(exercise.secondaryMuscles.map((muscle: string) => this.translateTextLibre(muscle)))
+          : [];
+      
         const translatedInstructions = exercise.instructions && Array.isArray(exercise.instructions)
-            ? await Promise.all(exercise.instructions.map((instruction: string) => this.translateTextLibre(instruction)))
-        : [];
+          ? await Promise.all(exercise.instructions.map((instruction: string) => this.translateTextLibre(instruction)))
+          : [];
       
         return {
-            name: translatedName,
-            musclue: translatedBodyPart,
-            gifUrl: exercise.gifUrl,
-            equipment: translatedEquipment,
-            target: translatedTarget,
-            secondaryMuscles: translatedSecondaryMuscles,
-            instructions: translatedInstructions,
+          name: translatedName,
+          musclue: mappedMuscle, 
+          gifUrl: exercise.gifUrl,
+        //   equipment: translatedEquipment,
+        //   target: translatedTarget,
+        //   secondaryMuscles: translatedSecondaryMuscles,
+          instructions: translatedInstructions,
         };
-    }
+      }
+      
       
     // Función para sincronizar los datos de un ejercicio con la base de datos.----------------------------------------------------
     async syncExercisesFromApi(): Promise<any> {
@@ -153,6 +184,9 @@ export class ExerciseService {
                     "X-RapidAPI-Key": process.env.RAPIDAPI_KEY,
                     "X-RapidAPI-Host": process.env.RAPIDAPI_HOST,
                 },
+                params: {
+                    limit: 300  // Traemos 150 ejercicios de la API
+                  }
             });
       
             const exercisesFromApi = response.data;
