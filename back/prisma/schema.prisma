@@ -44,8 +44,14 @@ enum Musclues {
   BICEPS
   TRICEPS
   HOMBROS
-  PIERNAS
   CORE
+  CARDIO
+  BRAZOS_INFERIORES
+  BRAZOS_SUPERIORES
+  PIERNAS_INFERIORES
+  PIERNAS_SUPERIORES
+  CUELLO  
+  CINTURA
 }
 
 model Users {
@@ -119,9 +125,10 @@ model Appointment {
 
 model Exercise {
   id       String            @id @default(uuid())
-  name     String
+  name     String            @unique
   musclue  Musclues
   gifUrl   String?
+  instructions String?
   routines RoutineExercise[]
 }
 
