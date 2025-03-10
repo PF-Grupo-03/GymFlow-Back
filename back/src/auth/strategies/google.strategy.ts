@@ -4,7 +4,6 @@ import { Strategy, VerifyCallback } from 'passport-google-oauth20';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../../prisma.service';
 import { UserRole } from 'src/enum/roles.enum';
-import { User } from 'mercadopago';
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {

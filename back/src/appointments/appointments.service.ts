@@ -5,14 +5,14 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
-import { CreateAppointmentsDto } from './appointments.dto';
+import { CreateAppointmentsDto } from './dtos/appointments.dto';
 
 @Injectable()
 export class AppointmentsService {
   constructor(private readonly prisma: PrismaService) {}
 
   async createAppointment(data: CreateAppointmentsDto) {
-    const { memberId, date, time } = data;
+    const { memberId, date, time, roomId } = data;
     // Verificar si el usuario tiene una membresía activa
     const member = await this.prisma.member.findUnique({
       where: { id: data.memberId },
@@ -56,35 +56,37 @@ export class AppointmentsService {
       );
     }
 
-    // if (
-    //   (membershipType === 'PREMIUM' || membershipType === 'DIAMOND') &&
-    //   existingAppointments.some((a) => a.roomId === roomId)
-    // ) {
-    //   throw new BadRequestException(
-    //     'Ya tienes un turno en esta sala para este día.',
-    //   );
-    // }
+    if (
+      (membershipType === 'PREMIUM' || membershipType === 'DIAMOND') &&
+      existingAppointments.some((a) => a.roomId === roomId)
+    ) {
+      throw new BadRequestException(
+        'Ya tienes un turno en esta sala para este día.',
+      );
+    }
 
-    // Convertir `date` de string a DateTime
+    // //Convertir `date` de string a DateTime
 
     // if (isNaN(appointmentDate.getTime())) {
     //   throw new BadRequestException(
     //     'Fecha inválida, asegúrate de enviarla en formato ISO-8601.',
     //   );
     // }
-    // Validar disponibilidad de la sala
-    // const roomAppointments = await this.prisma.appointment.count({
-    //   where: { roomId, date, time },
-    // });
+    //Validar disponibilidad de la sala
+    const roomAppointments = await this.prisma.appointment.count({
+      where: { roomId, date, time },
+    });
 
-    // const room = await this.prisma.room.findUnique({ where: { id: roomId } });
-    // if (!room) {
-    //   throw new NotFoundException('Sala no encontrada.');
-    // }
+    const room = await this.prisma.room.findUnique({ where: { id: roomId } });
+    if (!room) {
+      throw new NotFoundException('Sala no encontrada.');
+    }
 
-    // if (roomAppointments >= room.capacity) {
-    //   throw new BadRequestException('No hay más vacantes disponibles en esta sala para este horario.');
-    // }
+    if (roomAppointments >= room.capacity) {
+      throw new BadRequestException(
+        'No hay más vacantes disponibles en esta sala para este horario.',
+      );
+    }
     // Verificar que no haya un turno en la misma fecha y hora
     const existingAppointment = await this.prisma.appointment.findFirst({
       where: {
@@ -101,7 +103,7 @@ export class AppointmentsService {
     }
 
     return this.prisma.appointment.create({
-      data: { memberId, date, time },
+      data: { memberId, date, time, roomId },
       include: { member: { include: { user: true } } },
     });
   }
@@ -123,7 +125,7 @@ export class AppointmentsService {
     return appointment;
   }
 
-  async updateAppointmentStatus(id: string, status: string) {
+  async updateAppointment(id: string, status: string) {
     const validStatuses = ['ACTIVED', 'CANCELED'];
 
     if (!validStatuses.includes(status)) {
@@ -132,12 +134,20 @@ export class AppointmentsService {
 
     const appointment = await this.prisma.appointment.findUnique({
       where: { id },
+      include: { member: true },
     });
 
     if (!appointment) {
       throw new NotFoundException('Cita no encontrada.');
     }
 
+    // **Liberar cupo si se cancela**
+    if (status === 'CANCELED') {
+      await this.prisma.appointment.delete({ where: { id } });
+      return { message: 'Cita cancelada y cupo liberado.' };
+    }
+
+    // **Actualizar estado de la cita**
     return this.prisma.appointment.update({
       where: { id },
       data: { status },
