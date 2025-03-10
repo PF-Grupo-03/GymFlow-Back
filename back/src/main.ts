@@ -19,7 +19,7 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document);
 
   app.enableCors({
-    origin: 'https://gym-flow-front.vercel.app',
+    origin: process.env.LOCALFRONT || process.env.DEPLOYFRONT,
     methods: 'GET,PUT,PATCH,POST,DELETE',
     credentials: true,
   });
@@ -43,6 +43,5 @@ async function bootstrap() {
   await app.listen(port, () => {
     console.log(`🚀 Servidor corriendo en el puerto ${port}`);
   });
-
 }
 bootstrap();

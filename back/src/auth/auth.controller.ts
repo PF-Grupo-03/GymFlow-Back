@@ -5,8 +5,10 @@ import {
   Get,
   Post,
   Req,
+  Res,
   UseGuards,
 } from '@nestjs/common';
+import { Response } from 'express';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from '../users/dtos/users.dto';
 import { loginUserDto } from 'src/users/dtos/login.dto';
@@ -50,10 +52,23 @@ export class AuthController {
 
   @Get('google/redirect')
   @UseGuards(AuthGuard('google'))
-  googleAuthRedirect(@Req() req) {
-    return {
-      message: 'Usuario registrado correctamente',
-      user: req.user,
-    };
+  googleAuthRedirect(@Req() req, @Res() res: Response) {
+    const user = req.user;
+
+    const userId = req.user.user.id;
+
+    // Verificar si el usuario tiene los datos completos
+    const hasCompleteProfile =
+      user.dni && user.phone && user.address && user.bDate;
+
+    if (hasCompleteProfile) {
+      return res.redirect(
+        `https://gym-flow-front.vercel.app/MyAccount?id=${userId}`,
+      );
+    } else {
+      return res.redirect(
+        `https://gym-flow-front.vercel.app/CompletarPerfil?id=${userId}`,
+      );
+    }
   }
 }

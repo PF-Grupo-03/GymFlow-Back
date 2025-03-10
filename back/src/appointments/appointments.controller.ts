@@ -1,9 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ForbiddenException } from '@nestjs/common';
-import { AppointmentsService } from "./appointments.service"
-import { CreateAppointmentsDto } from './appointments.dto';
+import { Controller, Get, Post, Body, Patch, Param } from '@nestjs/common';
+import { AppointmentsService } from './appointments.service';
+import { CreateAppointmentsDto } from './dtos/appointments.dto';
 import { PrismaService } from 'src/prisma.service';
-import { UpdateAppointmentStatusDto } from './update-appointment.dto';
-
+import { UpdateAppointmentStatusDto } from './dtos/update-appointment.dto';
 
 @Controller('appointments')
 export class AppointmentsController {
@@ -25,19 +24,16 @@ export class AppointmentsController {
   }
 
   @Patch(':id/status')
-  updateAppointmentStatus(@Param('id') id: string, @Body() updateAppointmentStatusDto: UpdateAppointmentStatusDto) {
-    return this.appointmentsService.updateAppointmentStatus(id, updateAppointmentStatusDto.status);
+  updateAppointmentStatus(
+    @Param('id') id: string,
+    @Body() updateAppointmentStatusDto: UpdateAppointmentStatusDto,
+  ) {
+    return this.appointmentsService.updateAppointment(
+      id,
+      updateAppointmentStatusDto.status,
+    );
   }
 }
-
-
-
-
-
-
-
-
-
 
 // @Controller('appointments')
 // export class AppointmentsController {
@@ -48,11 +44,11 @@ export class AppointmentsController {
 //     const member = await this.prisma.member.findUnique({
 //       where: { id: createAppointmentDto.memberId },
 //     });
-  
+
 //     if (!member || !member.isActive) {
 //       throw new ForbiddenException('Debes tener una membresía activa para agendar una cita.');
 //     }
-  
+
 //     return this.appointmentsService.createAppointment(createAppointmentDto);
 //   }
 

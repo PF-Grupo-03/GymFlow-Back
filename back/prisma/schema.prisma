@@ -103,10 +103,20 @@ model Payment {
   updatedAt   DateTime @updatedAt
 }
 
+model Room {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  capacity  Int      @default(20)
+  appointments Appointment[]
+}
+
 model Appointment {
   id       String @id @default(uuid())
   memberId String
   member   Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  roomId   String
+  room     Room @relation(fields: [roomId], references: [id])
 
   date String
   time String
