@@ -76,11 +76,11 @@ export class PaymentService {
         }
 
       let membershipType: MemberShipType;
-      if (paymentInfo.transaction_amount === 18000) {
+      if (paymentInfo.transaction_amount === 1) {
         membershipType = MemberShipType.BASIC;
-      } else if (paymentInfo.transaction_amount === 30000) {
+      } else if (paymentInfo.transaction_amount === 2) {
         membershipType = MemberShipType.PREMIUM;
-      } else if (paymentInfo.transaction_amount === 50000) {
+      } else if (paymentInfo.transaction_amount === 3) {
         membershipType = MemberShipType.DIAMOND;
       } else {
         throw new BadRequestException('Monto de pago no válido para una membresía.');
