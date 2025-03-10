@@ -19,7 +19,7 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document);
 
   app.enableCors({
-    origin: process.env.LOCALFRONT || process.env.DEPLOYFRONT,
+    origin: process.env.DEPLOYFRONT || process.env.LOCALFRONT,
     methods: 'GET,PUT,PATCH,POST,DELETE',
     credentials: true,
   });
