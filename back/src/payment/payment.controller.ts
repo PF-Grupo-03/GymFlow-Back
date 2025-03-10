@@ -23,10 +23,18 @@ export class PaymentController {
   @Post('webhook')
   async handleWebhook(@Body() body: any) {
     this.logger.log(`📩 Webhook recibido: ${JSON.stringify(body)}`);
-    if (body.type === 'payment' && body.id) {
-      return this.paymentService.processPayment(body.id);
+    
+    // Verificar si el webhook tiene el tipo y el ID
+    if (!body || !body.type || !body.data || !body.data.id) {
+      this.logger.error('❌ Webhook recibido con formato incorrecto.');
+      return { message: 'Formato de Webhook incorrecto' };
     }
-    return { message: 'Webhook recibido, pero no procesado.' };
+
+    if (body.type === 'payment') {
+      return this.paymentService.processPayment(body.data.id);
+    }
+
+    return { message: 'Webhook recibido, pero sin acción relevante.' };
   }
 }
 
