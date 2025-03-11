@@ -3,18 +3,17 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, VerifyCallback } from 'passport-google-oauth20';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../../prisma.service';
-import { UserRole } from 'src/enum/roles.enum';
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
   constructor(
-    configService: ConfigService,
+    private configService: ConfigService,
     private readonly prisma: PrismaService,
   ) {
     super({
-      clientID: configService.get<string>('GOOGLE_CLIENT_ID'),
-      clientSecret: configService.get<string>('GOOGLE_CLIENT_SECRET'),
-      callbackURL: configService.get<string>('GOOGLE_REDIRECT_URI'),
+      clientID: configService.get('GOOGLE_CLIENT_ID'),
+      clientSecret: configService.get('GOOGLE_CLIENT_SECRET'),
+      callbackURL: configService.get('GOOGLE_REDIRECT_URI'),
       scope: ['email', 'profile'],
     });
   }
@@ -25,32 +24,13 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     profile: any,
     done: VerifyCallback,
   ): Promise<any> {
-    // Aseguramos que el email esté en minúsculas
-    const email = profile.emails[0].value.toLowerCase();
-
-    // Validamos que el perfil contenga la información necesaria
-    if (!profile.name || !profile.emails || !email) {
-      return done(new Error('Faltan datos en el perfil de Google'), null);
-    }
-
-    let user = await this.prisma.users.findUnique({
-      where: { email },
-    });
-
-    if (!user) {
-      user = await this.prisma.users.create({
-        data: {
-          email: email,
-          nameAndLastName: `${profile.name.givenName} ${profile.name.familyName}`,
-          role: UserRole.USER_MEMBER || UserRole.USER_TRAINING,
-          dni: '', // Valor por defecto
-          password: '', // No se usa, pero es obligatorio
-          bDate: new Date(), // O una fecha predeterminada
-          address: '', // Valor por defecto
-          phone: '', // Valor por defecto
-        },
-      });
-    }
+    const user = {
+      accessToken,
+      // Asegúrate de que el objeto profile tenga la estructura esperada.
+      emails: profile.emails,
+      displayName: profile.displayName,
+      // Agrega otros campos que necesites
+    };
 
     done(null, user);
   }
