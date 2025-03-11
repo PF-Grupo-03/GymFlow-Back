@@ -128,7 +128,7 @@ model Exercise {
   name     String            @unique
   musclue  Musclues
   gifUrl   String?
-  instructions String[]
+  instructions String[]      @default([])
   routines RoutineExercise[]
 }
 

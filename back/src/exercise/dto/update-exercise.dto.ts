@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Musclues } from "@prisma/client";
-import { IsEnum, IsNotEmpty, IsOptional, IsString, IsUrl } from "class-validator";
+import { IsArray, IsEnum, IsNotEmpty, IsOptional, IsString, IsUrl } from "class-validator";
 
 export class UpdateExerciseDto {
     @ApiProperty({example: 'Press de banca con mancuernas'})
@@ -17,5 +17,10 @@ export class UpdateExerciseDto {
     @IsUrl()
     @IsOptional()
     gifUrl?: string;
+
+    @ApiProperty({example: ['Explicación de la práctica 1', 'Explicación de la práctica 2']})
+    @IsArray()
+    @IsOptional()
+    instructions?: string[];
 
 }
