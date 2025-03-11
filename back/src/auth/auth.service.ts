@@ -10,7 +10,6 @@ import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { Users } from '@prisma/client';
 import { UserRole } from 'src/enum/roles.enum';
-import { GoogleDto } from './google.dto';
 
 @Injectable()
 export class AuthService {
@@ -74,8 +73,6 @@ export class AuthService {
       },
     });
 
-    
-
     if (!saveUser.approved) {
       return {
         messege:
@@ -132,7 +129,7 @@ export class AuthService {
       token,
     };
   }
-  async validateOrCreateGoogleUser({ accessToken, profile }: GoogleDto) {
+  async validateOrCreateGoogleUser(profile: any) {
     const email = profile.emails[0].value.toLowerCase();
     let user = await this.prisma.users.findUnique({
       where: { email },
@@ -141,21 +138,20 @@ export class AuthService {
     if (!user) {
       user = await this.prisma.users.create({
         data: {
-          email: profile.emails[0].value.toLowerCase(),
+          email,
           nameAndLastName: profile.displayName,
-          role: UserRole.USER_MEMBER || UserRole.USER_TRAINING, // Asignar rol por defecto
+          role: UserRole.USER_MEMBER,
           dni: '',
           password: '',
           bDate: new Date(),
           address: '',
           phone: '',
-          googleAccessToken: accessToken,
         },
       });
     } else {
       user = await this.prisma.users.update({
-        where: { email },
-        data: { googleAccessToken: accessToken },
+        where: { email: email },
+        data: { nameAndLastName: profile.displayName },
       });
     }
 

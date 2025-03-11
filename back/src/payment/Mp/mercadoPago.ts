@@ -70,10 +70,10 @@ export class MercadoPagoService {
           },
         },
         payment_methods: {
-          excluded_payment_types: [{ id: 'ticket' }, { id: 'atm' }],
+          excluded_payment_types: [],
           installments: 1,
         },
-        binary_mode: true,
+        binary_mode: false,
         expires: false,
         statement_descriptor: 'Tu Empresa',
         external_reference: userId,
