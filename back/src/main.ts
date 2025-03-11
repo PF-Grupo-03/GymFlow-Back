@@ -16,7 +16,7 @@ async function bootstrap() {
 
   const document = SwaggerModule.createDocument(app, swaggerConfig);
 
-  SwaggerModule.setup('api', app, document);
+  SwaggerModule.setup('api', app, document, {customSiteTitle: 'Gym Flow API'});
 
   // Configuración CORS
   app.enableCors({
