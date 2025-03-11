@@ -3,12 +3,14 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, VerifyCallback } from 'passport-google-oauth20';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../../prisma.service';
+import { AuthService } from '../auth.service';
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
   constructor(
     private configService: ConfigService,
     private readonly prisma: PrismaService,
+    private authService: AuthService, // Inyectar AuthService
   ) {
     super({
       clientID: configService.get('GOOGLE_CLIENT_ID'),
@@ -24,14 +26,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     profile: any,
     done: VerifyCallback,
   ): Promise<any> {
-    const user = {
-      accessToken,
-      // Asegúrate de que el objeto profile tenga la estructura esperada.
-      emails: profile.emails,
-      displayName: profile.displayName,
-      // Agrega otros campos que necesites
-    };
-
-    done(null, user);
+    const user = await this.authService.validateOrCreateGoogleUser(profile);
+    return done(null, user);
   }
 }
