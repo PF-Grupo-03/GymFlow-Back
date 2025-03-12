@@ -50,8 +50,7 @@ export class AuthGuard implements CanActivate {
       user.exp = new Date(user.exp * 1000);
       user.iat = new Date(user.iat * 1000);
 
-      // Asignamos roles a los usuarios basado en isAdmin.
-      user.roles = user.isAdmin === true ? ['admin'] : ['user'];
+      user.roles = [user.role]
 
       console.log('AuthGuard - Token decodificado:', user);
 

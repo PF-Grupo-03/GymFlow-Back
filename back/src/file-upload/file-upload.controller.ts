@@ -1,12 +1,17 @@
-import { Controller, Param, Post, UploadedFile, UseInterceptors, BadRequestException } from '@nestjs/common';
+import { Controller, Param, Post, UploadedFile, UseInterceptors, BadRequestException, UseGuards } from '@nestjs/common';
 import { FileUploadService } from './file-upload.service';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiBearerAuth } from '@nestjs/swagger';
+import { TrainerGuard } from 'src/guards/trainer.guards';
+import { AuthGuard } from 'src/guards/auth.guards';
 
 @Controller('files')
 export class FileUploadController {
   constructor(private readonly fileUploadService: FileUploadService) {}
 
+  @ApiBearerAuth()
   @Post(':exerciseId')
+  @UseGuards(AuthGuard, TrainerGuard)
   @UseInterceptors(FileInterceptor('file'))
   async uploadFile(
     @UploadedFile() file: Express.Multer.File,
