@@ -137,7 +137,7 @@ export class PaymentService {
 
   async getPaymentInfo(paymentId: string) {
     try {
-      const response = await axios.get(`https://api.mercadopago.com/v1/payments/${paymentId}`, {
+      const response = await axios.get(`https://sandbox.api.mercadopago.com/v1/payments/${paymentId}`, {
         headers: {
           Authorization: `Bearer ${process.env.MERCADOPAGO_ACCESS_TOKEN}`,
         },
