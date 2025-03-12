@@ -71,7 +71,7 @@ export class AuthController {
       );
     } else {
       return res.redirect(
-        `${process.env.DEPLOYFRONT}/CompletarPerfil?id=${userId}`,
+        `${process.env.DEPLOYFRONT}/CompletarPerfil?id=${userId}&token=${token}`,
       );
     }
   }
