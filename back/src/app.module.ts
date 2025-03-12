@@ -29,7 +29,9 @@ import { ExerciseModule } from './exercise/exercise.module';
     PaymentModule,
     FileUploadModule,
     PaymentModule,
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
     EmailModule,
   ],
   controllers: [],
