@@ -129,12 +129,12 @@ export class ExerciseService {
           "cuello": Musclues.CUELLO,
           "cintura": Musclues.CINTURA
         };
-      
+     
         let seededCount = 0;
         
         for (const exercise of this.exercises) {
           // Usamos "nombre" o "name" como nombre del ejercicio
-          const exerciseName = exercise.nombre || exercise.name;
+          const exerciseName = exercise.nombre || exercise.Nombre;
           if (!exerciseName) {
             console.warn("Ejercicio sin nombre, se omitirá:", exercise);
             continue;
@@ -159,13 +159,13 @@ export class ExerciseService {
               update: {
                 musclue: muscluesMap[muscleKey],
                 gifUrl: exercise.gifUrl,
-                instructions: exercise.instrucciones || exercise.instructions,
+                instructions: exercise.instrucciones,
               },
               create: {
                 name: exerciseName,
                 musclue: muscluesMap[muscleKey],
                 gifUrl: exercise.gifUrl,
-                instructions: exercise.instrucciones || exercise.instructions,
+                instructions: exercise.instrucciones,
               },
             });
             seededCount++;
