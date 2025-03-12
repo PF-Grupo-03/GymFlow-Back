@@ -51,7 +51,7 @@ export class AuthController {
 
   @Get('google/redirect')
   @UseGuards(AuthGuard('google'))
-  googleAuthRedirect(@Req() req, @Res() res: Response) {
+  async googleAuthRedirect(@Req() req, @Res() res: Response) {
     console.log('Usuario autenticado:', req.user);
 
     // Extraemos el usuario de req.user
@@ -63,12 +63,15 @@ export class AuthController {
     // Verificar si el usuario tiene los datos completos
     const hasCompleteProfile =
       userData.dni && userData.phone && userData.address && userData.bDate;
+    const token = await this.authService.generateToken(userData);
 
     if (hasCompleteProfile) {
-      return res.redirect(`https://gym-flow-front.vercel.app`);
+      return res.redirect(
+        `${process.env.DEPLOYFRONT}/Google?id=${userId}&token=${token}`,
+      );
     } else {
       return res.redirect(
-        `https://gym-flow-front.vercel.app/CompletarPerfil?id=${userId}`,
+        `${process.env.DEPLOYFRONT}/CompletarPerfil?id=${userId}`,
       );
     }
   }

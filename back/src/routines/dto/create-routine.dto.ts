@@ -10,10 +10,21 @@ export class CreateRoutineDto {
     @IsNotEmpty()
     day: DayOfWeek;
   
+    @ApiProperty({example: 'ID del usuario'})
     @IsString()
     @IsNotEmpty()
     userId: string;
   
+    @ApiProperty({
+      type: [CreateRoutineExerciseDto],
+      example: [
+        {
+          exerciseId: '161e9521-386f-49c1-bca5-91cc7a2b11ca',
+          series: 3,
+          repetitions: 13,
+        },
+      ],
+    })
     @IsArray()
     @ValidateNested({ each: true })
     @Type(() => CreateRoutineExerciseDto)
