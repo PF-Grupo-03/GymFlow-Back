@@ -2,6 +2,7 @@ import { ApiProperty } from "@nestjs/swagger";
 import { IsInt, IsNotEmpty, IsPositive, IsString, Max, Min } from "class-validator";
 
 export class CreateRoutineExerciseDto {
+  @ApiProperty({example: '161e9521-386f-49c1-bca5-91cc7a2b11ca'})
     @IsString()
     @IsNotEmpty()
     exerciseId: string;
