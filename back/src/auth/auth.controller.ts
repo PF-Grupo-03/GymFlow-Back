@@ -53,13 +53,16 @@ export class AuthController {
   @UseGuards(AuthGuard('google'))
   googleAuthRedirect(@Req() req, @Res() res: Response) {
     console.log('Usuario autenticado:', req.user);
-    const user = req.user;
 
-    const userId = user.id;
+    // Extraemos el usuario de req.user
+    const { user: userData } = req.user;
+    console.log('Datos del usuario:', userData);
+
+    const userId = userData.id;
 
     // Verificar si el usuario tiene los datos completos
     const hasCompleteProfile =
-      user.dni && user.phone && user.address && user.bDate;
+      userData.dni && userData.phone && userData.address && userData.bDate;
 
     if (hasCompleteProfile) {
       return res.redirect(`https://gym-flow-front.vercel.app`);

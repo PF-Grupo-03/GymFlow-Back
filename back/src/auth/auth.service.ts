@@ -155,7 +155,8 @@ export class AuthService {
       });
     }
 
-    return this.generateToken(user);
+    const token = await this.generateToken(user);
+    return { user, token };
   }
 
   async generateToken(user: Users) {
