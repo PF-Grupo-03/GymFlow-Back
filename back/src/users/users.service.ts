@@ -8,10 +8,14 @@ import { PrismaService } from 'src/prisma.service';
 import { CreateUserDto } from './dtos/users.dto';
 import { ApproveTrainerDto } from './dtos/approveTrainer.dto';
 import { UpdateUserDto } from './dtos/updateUser.dto';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private jwtService: JwtService
+  ) {}
 
   private excludePassword(user: any) {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -118,9 +122,16 @@ export class UsersService {
           approved: true,
         },
       });
+      // Generamos el token de autenticación.
+    const payload = {
+      id: updatedUser.id,
+      email: updatedUser.email,
+      role: updatedUser.role,
+    };
+    const token = this.jwtService.sign(payload);
 
       const { password, ...userWithoutPassword } = updatedUser;
-      return userWithoutPassword;
+      return { userWithoutPassword, token };
     } catch (error) {
       if (error instanceof BadRequestException) {
         throw error;
