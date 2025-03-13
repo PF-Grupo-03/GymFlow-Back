@@ -12,6 +12,7 @@ import { EmailService } from './email/email.service';
 import { EmailModule } from './email/email.module';
 import { ExerciseModule } from './exercise/exercise.module';
 import { RoomsModule } from './rooms/rooms.module';
+import { AttendanceModule } from './attendance/attendance.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { RoomsModule } from './rooms/rooms.module';
     }),
     EmailModule,
     RoomsModule,
+    AttendanceModule,
   ],
   controllers: [],
   providers: [EmailService],

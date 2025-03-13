@@ -87,7 +87,7 @@ export class AppointmentsService {
         'No hay más vacantes disponibles en esta sala para este horario.',
       );
     }
-    // Verificar que no haya un turno en la misma fecha y hora
+
     const existingAppointment = await this.prisma.appointment.findFirst({
       where: {
         memberId: data.memberId,
@@ -110,7 +110,7 @@ export class AppointmentsService {
 
   async findAll(memberId: string) {
     return this.prisma.appointment.findMany({
-      where: { memberId }, // Filtrar por el ID del miembro
+      where: { memberId },
       include: { member: { include: { user: true } } },
     });
   }
@@ -141,13 +141,11 @@ export class AppointmentsService {
       throw new NotFoundException('Cita no encontrada.');
     }
 
-    // **Liberar cupo si se cancela**
     if (status === 'CANCELED') {
       await this.prisma.appointment.delete({ where: { id } });
       return { message: 'Cita cancelada y cupo liberado.' };
     }
 
-    // **Actualizar estado de la cita**
     return this.prisma.appointment.update({
       where: { id },
       data: { status },
