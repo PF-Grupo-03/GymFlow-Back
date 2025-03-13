@@ -1,6 +1,8 @@
-import { Controller, Post, Body, Logger } from '@nestjs/common';
+import { Controller, Post, Body, Logger, UseGuards } from '@nestjs/common';
 import { PaymentService } from './payment.service';
-import { CreatePreferenceDto, ProcessPaymentDto } from "./payment.dto"
+import { CreatePreferenceDto } from "./payment.dto"
+import { ApiBearerAuth } from '@nestjs/swagger';
+import { AuthGuard } from 'src/guards/auth.guards';
 
 @Controller('payment')
 export class PaymentController {
@@ -8,17 +10,15 @@ export class PaymentController {
 
   constructor(private readonly paymentService: PaymentService) {}
 
+
+  @ApiBearerAuth()
   @Post('preference')
+  @UseGuards(AuthGuard)
   async createPreference(@Body() body: CreatePreferenceDto) {
     this.logger.log(`Creando preferencia para usuario: ${body.userEmail}`);
     return this.paymentService.createPreference(body.userId, body.userEmail, body.title, body.price);
   }
 
-  // @Post('process')
-  // async processPayment(@Body() body: ProcessPaymentDto) {
-  //   this.logger.log(`Procesando pago con ID: ${body.paymentId} para usuario: ${body.userEmail}`);
-  //   return this.paymentService.processPayment(body);
-  // }
 
   @Post('webhook')
   async handleWebhook(@Body() body: any) {
