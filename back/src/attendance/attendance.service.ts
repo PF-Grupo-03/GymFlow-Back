@@ -21,7 +21,7 @@ export class AttendanceService {
       throw new NotFoundException('Turno no encontrado.');
     }
 
-    const secret = process.env.QR_SECRET || 'supersecreto';
+    const secret = process.env.QR_SECRET;
     const token = jwt.sign(
       {
         appointmentId: appointment.id,
@@ -81,8 +81,11 @@ export class AttendanceService {
       throw new BadRequestException('El turno ya fue marcado como presente.');
     }
 
-    return this.prisma.attendance.create({
-      data: { appointmentId: decoded.appointmentId },
+    await this.prisma.attendance.create({
+      data: {
+        appointmentId: decoded.appointmentId,
+        userId: decoded.userId,
+      },
     });
   }
   async getUserAttendance(userId: string) {
