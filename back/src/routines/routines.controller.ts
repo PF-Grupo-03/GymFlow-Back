@@ -66,7 +66,7 @@ export class RoutinesController {
   @ApiBearerAuth()
   @Delete(':id')
   @UseGuards(AuthGuard, TrainerGuard)
-  async deleteRoutine(@Param('id') id: string) {
-    return this.routinesService.deleteRoutine(id);
+  async softDeleteRoutine(@Param('id') id: string) {
+    return this.routinesService.softDeleteRoutine(id);
   }
 }

@@ -82,8 +82,8 @@ export class ExerciseController {
     @ApiBearerAuth()
     @Delete(':id')
     @UseGuards(AuthGuard, TrainerGuard)
-    async deleteExercise(@Param('id') id: string) {
-      return await this.exerciseService.deleteExercise(id);
+    async softDeleteExercise(@Param('id') id: string) {
+      return await this.exerciseService.softDeleteExercise(id);
     }
 
     @ApiBearerAuth()

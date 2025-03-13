@@ -113,6 +113,7 @@ model Room {
   name      String   @unique
   capacity  Int      @default(20)
   appointments Appointment[]
+  isDeleted Boolean @default(false)
 }
 
 model Appointment {
@@ -139,6 +140,7 @@ model Exercise {
   gifUrl   String?
   instructions String[]      @default([])
   routines RoutineExercise[]
+  isDeleted Boolean @default(false)
 }
 
 model Routine {
@@ -147,6 +149,7 @@ model Routine {
   user     Users             @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId   String
   routines RoutineExercise[]
+  isDeleted Boolean @default(false)
 }
 
 model RoutineExercise {
@@ -159,6 +162,7 @@ model RoutineExercise {
   exerciseId  String
   series      Int
   repetitions Int
+  isDeleted Boolean @default(false)
 }
 model EmailLog {
   id         String   @id @default(uuid()) 

@@ -11,7 +11,9 @@ export class RoomsService {
   }
 
   async findAll() {
-    return this.prisma.room.findMany();
+    return this.prisma.room.findMany({
+      where: { isDeleted: false },
+    });
   }
 
   async findOneById(id: string) {
@@ -33,8 +35,12 @@ export class RoomsService {
     });
   }
 
-  async deleteRoom(id: string) {
+  async softDeleteRoom(id: string) {
     await this.findOneById(id);
-    return this.prisma.room.delete({ where: { id } });
+    await this.prisma.room.update({
+      where: { id },
+      data: { isDeleted: true },
+  });
+  return {message: `Sala con ID: ${id} eliminada con éxito.`};
   }
 }
