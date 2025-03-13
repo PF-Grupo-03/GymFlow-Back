@@ -62,7 +62,7 @@ export class RoomsController {
   @ApiBearerAuth()
   @Delete(':id')
   @UseGuards(AuthGuard, TrainerGuard)
-  deleteRoom(@Param('id') id: string) {
-    return this.roomsService.deleteRoom(id);
+  softDeleteRoom(@Param('id') id: string) {
+    return this.roomsService.softDeleteRoom(id);
   }
 }

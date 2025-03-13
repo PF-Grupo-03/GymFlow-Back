@@ -51,7 +51,9 @@ export class ExerciseService {
     }
 
     async getAllExercises(){
-        const exercises = await this.prisma.exercise.findMany();
+        const exercises = await this.prisma.exercise.findMany({
+            where: { isDeleted: false }
+        });
         if (!exercises.length) {
             throw new NotFoundException('No se encontraron ejercicios registrados.');
         }        
@@ -97,7 +99,7 @@ export class ExerciseService {
         return { message: "Ejercicio actualizado con éxito", updatedExercise };
     }
 
-    async deleteExercise(id: string) {
+    async softDeleteExercise(id: string) {
         const exercise = await this.prisma.exercise.findUnique({
             where: { id }
         });
@@ -106,7 +108,10 @@ export class ExerciseService {
             throw new NotFoundException(`No se encontró el ejercicio con ID: ${id}, eliminación fallida.`);
         }
 
-        await this.prisma.exercise.delete({ where: { id } });
+        await this.prisma.exercise.update({
+            where: { id },
+            data: { isDeleted: true },
+        });
 
         return { message: `Ejercicio con ID: ${id} eliminado con éxito.` };
     }

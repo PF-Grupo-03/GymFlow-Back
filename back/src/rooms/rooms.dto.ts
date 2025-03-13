@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, IsInt, Min, Length } from 'class-validator';
+import { IsNotEmpty, IsString, IsInt, Min, Length, Max } from 'class-validator';
 
 export class CreateRoomDto {
   @ApiProperty({ example: 'Musculación' })
@@ -10,7 +10,8 @@ export class CreateRoomDto {
   @ApiProperty({ example: 20 })
   @IsNotEmpty()
   @IsInt()
-  @Length(1, 20)
+  @Min(1)
+  @Max(20)
   capacity: number;
 }
 
@@ -19,8 +20,9 @@ export class UpdateRoomDto {
   @IsString()
   name?: string;
 
-  @ApiProperty({ example: 25 })
+  @ApiProperty({ example: 15 })
   @IsInt()
-  @Length(1, 20)
+  @Min(1)
+  @Max(20)
   capacity?: number;
 }
