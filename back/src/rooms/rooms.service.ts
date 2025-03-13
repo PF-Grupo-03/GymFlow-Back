@@ -10,15 +10,15 @@ import { CreateRoomDto, UpdateRoomDto } from './rooms.dto';
 export class RoomsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async createRoom(data: CreateRoomDto) {
-    if (data.type === 'FUNCIONAL') {
-      if (!data.teacherId) {
+  async createRoom(createRoomDto: CreateRoomDto) {
+    if (createRoomDto.type === 'FUNCIONAL') {
+      if (!createRoomDto.teacherId) {
         throw new BadRequestException(
           'Para una sala FUNCIONAL, debe asignarse un profesor.',
         );
       }
       const teacher = await this.prisma.users.findUnique({
-        where: { id: data.teacherId },
+        where: { id: createRoomDto.teacherId },
       });
       if (!teacher || teacher.role !== 'USER_TRAINING') {
         throw new BadRequestException(
@@ -26,6 +26,18 @@ export class RoomsService {
         );
       }
     }
+    const data: any = {
+      name: createRoomDto.name,
+      capacity: createRoomDto.capacity,
+      day: createRoomDto.day,
+      time: createRoomDto.time,
+      type: createRoomDto.type,
+      isDeleted: false,
+      teacher: createRoomDto.teacherId
+        ? { connect: { id: createRoomDto.teacherId } }
+        : undefined,
+    };
+
     return this.prisma.room.create({ data });
   }
 
@@ -47,10 +59,17 @@ export class RoomsService {
     return room;
   }
 
-  async updateRoom(id: string, data: UpdateRoomDto) {
-    if (data.type === 'FUNCIONAL' && data.teacherId) {
+  async updateRoom(id: string, updateRoomDto: UpdateRoomDto) {
+    const existingRoom = await this.findOneById(id);
+
+    if (updateRoomDto.type === 'FUNCIONAL') {
+      if (!updateRoomDto.teacherId) {
+        throw new BadRequestException(
+          'Para una sala FUNCIONAL, debe asignarse un profesor.',
+        );
+      }
       const teacher = await this.prisma.users.findUnique({
-        where: { id: data.teacherId },
+        where: { id: updateRoomDto.teacherId },
       });
       if (!teacher || teacher.role !== 'USER_TRAINING') {
         throw new BadRequestException(
@@ -58,6 +77,17 @@ export class RoomsService {
         );
       }
     }
+    const data: any = {
+      name: updateRoomDto.name,
+      capacity: updateRoomDto.capacity,
+      day: updateRoomDto.day,
+      time: updateRoomDto.time,
+      type: updateRoomDto.type,
+      teacher: updateRoomDto.teacherId
+        ? { connect: { id: updateRoomDto.teacherId } }
+        : undefined,
+    };
+
     return this.prisma.room.update({
       where: { id },
       data,
@@ -69,7 +99,7 @@ export class RoomsService {
     await this.prisma.room.update({
       where: { id },
       data: { isDeleted: true },
-  });
-  return {message: `Sala con ID: ${id} eliminada con éxito.`};
+    });
+    return { message: `Sala con ID: ${id} eliminada con éxito.` };
   }
 }
