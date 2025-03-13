@@ -9,7 +9,6 @@ import {
   Max,
 } from 'class-validator';
 
-
 export class CreateRoomDto {
   @ApiProperty({ example: 'Musculación' })
   @IsNotEmpty()
