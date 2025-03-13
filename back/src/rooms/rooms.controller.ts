@@ -22,7 +22,7 @@ export class RoomsController {
   constructor(private readonly roomsService: RoomsService) {}
 
   @ApiBearerAuth()
-  @Post()
+  @Post('register')
   @UseGuards(AuthGuard, TrainerGuard)
   createRoom(@Body() createRoomDto: CreateRoomDto) {
     return this.roomsService.createRoom(createRoomDto);
