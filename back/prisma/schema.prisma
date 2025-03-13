@@ -76,6 +76,8 @@ model Users {
   routines Routine[]
   teacherRooms Room[]   @relation("TeacherRooms")
 
+  attendances       Attendance[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -135,7 +137,7 @@ model Appointment {
   roomId   String
   room     Room @relation(fields: [roomId], references: [id])
 
-  attendance Attendance?
+  attendance   Attendance[] @relation("AppointmentAttendances")
 
   date String
   time String
@@ -148,9 +150,11 @@ model Appointment {
 
 model Attendance {
   id            String     @id @default(uuid())
-  appointment   Appointment @relation(fields: [appointmentId], references: [id])
-  appointmentId String     @unique
-  checkedInAt   DateTime   @default(now())
+  userId        String
+  user          Users        @relation(fields: [userId], references: [id]) 
+  appointmentId String
+  appointment   Appointment @relation("AppointmentAttendances", fields: [appointmentId], references: [id])
+  createdAt     DateTime    @default(now())
 }
 
 model Exercise {
