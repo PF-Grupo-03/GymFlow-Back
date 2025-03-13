@@ -9,6 +9,7 @@ import {
   Max,
 } from 'class-validator';
 
+
 export class CreateRoomDto {
   @ApiProperty({ example: 'Musculación' })
   @IsNotEmpty()
@@ -58,7 +59,7 @@ export class UpdateRoomDto {
   @IsString()
   name?: string;
 
-  @ApiProperty({ example: 25 })
+  @ApiProperty({ example: 15 })
   @IsInt()
   @Min(1)
   @Max(20)

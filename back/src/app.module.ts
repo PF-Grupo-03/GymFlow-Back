@@ -14,6 +14,7 @@ import { ExerciseModule } from './exercise/exercise.module';
 import { RoomsModule } from './rooms/rooms.module';
 import { AttendanceModule } from './attendance/attendance.module';
 
+
 @Module({
   imports: [
     JwtModule.register({
@@ -36,6 +37,7 @@ import { AttendanceModule } from './attendance/attendance.module';
     EmailModule,
     RoomsModule,
     AttendanceModule,
+
   ],
   controllers: [],
   providers: [EmailService],
