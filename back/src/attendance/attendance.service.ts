@@ -7,6 +7,13 @@ import { PrismaService } from 'src/prisma.service';
 import * as jwt from 'jsonwebtoken';
 import QRCode from 'qrcode';
 
+interface DecodedToken {
+  appointmentId: string;
+  userId: string;
+  date: string;
+  time: string;
+}
+
 @Injectable()
 export class AttendanceService {
   constructor(private readonly prisma: PrismaService) {}
@@ -45,15 +52,10 @@ export class AttendanceService {
 
   async registerAttendance(token: string) {
     const secret = process.env.QR_SECRET;
-    let decoded;
+    let decoded: DecodedToken;
 
     try {
-      decoded = jwt.verify(token, secret) as {
-        appointmentId: string;
-        userId: string;
-        date: string;
-        time: string;
-      };
+      decoded = jwt.verify(token, secret) as DecodedToken;
     } catch {
       throw new BadRequestException('QR inválido o expirado.');
     }
