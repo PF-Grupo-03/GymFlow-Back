@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { DayOfWeek } from 'src/enum/day.enum';
 import { Musclues } from 'src/enum/musclues.enum';
 import { PrismaService } from 'src/prisma.service';
@@ -27,6 +27,24 @@ export class RoutinesService {
         if (existingExercises.length !== exerciseIds.length) {
             throw new BadRequestException("Uno o más ejercicios no existen.");
         }
+         
+        const existingRoutine = await this.prisma.routine.findFirst({
+            where: {
+                day,
+                userId,
+                isDeleted: false,
+                routines: {
+                    every: {
+                        exerciseId: { in: exerciseIds }
+                    }
+                }
+            }
+        });
+
+        if (existingRoutine) {
+            throw new ConflictException("Ya existe una rutina con los mismos ejercicios para este día.");
+        }
+
         const newRoutine = await this.prisma.routine.create({
             data: {
                 day,
@@ -46,7 +64,15 @@ export class RoutinesService {
 
     async getAllRoutines() {
         const routines = await this.prisma.routine.findMany({
-            include: { routines: { include: { exercise: true } } },
+            where: {
+                isDeleted: false,
+            },
+            include: {
+                routines: {
+                    where: { isDeleted: false },
+                    include: { exercise: true }
+                },
+            },
         });
         if (!routines.length){
             throw new NotFoundException("No se encontraron rutinas.");
@@ -137,17 +163,23 @@ export class RoutinesService {
     }
     
 
-    async deleteRoutine(id: string) {
-        await this.prisma.routineExercise.deleteMany({
+    async softDeleteRoutine(id: string) {
+        
+        await this.prisma.routineExercise.updateMany({
             where: { routineId: id },
+            data: { isDeleted: true },
         });
-
-        const deletedRoutine = await this.prisma.routine.delete({
+    
+        const deletedRoutine = await this.prisma.routine.update({
             where: { id },
+            data: { isDeleted: true },
         });
-        if (deletedRoutine) {
+    
+        if (!deletedRoutine.isDeleted) {
             throw new BadRequestException(`La rutina con el ID: ${id} no se pudo eliminar.`);
         }
+    
         return { message: `Rutina con el ID: ${id} eliminada con éxito.` };
     }
+    
 }

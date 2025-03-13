@@ -11,7 +11,7 @@ import { ConfigModule } from '@nestjs/config';
 import { EmailService } from './email/email.service';
 import { EmailModule } from './email/email.module';
 import { ExerciseModule } from './exercise/exercise.module';
-
+import { RoomsModule } from './rooms/rooms.module';
 
 @Module({
   imports: [
@@ -21,11 +21,11 @@ import { ExerciseModule } from './exercise/exercise.module';
       signOptions: { expiresIn: '1h' },
     }),
     AuthModule,
-    UsersModule, 
+    UsersModule,
     ExerciseModule,
-    RoutinesModule, 
-    MembersModule, 
-    AppointmentsModule, 
+    RoutinesModule,
+    MembersModule,
+    AppointmentsModule,
     PaymentModule,
     FileUploadModule,
     PaymentModule,
@@ -33,6 +33,7 @@ import { ExerciseModule } from './exercise/exercise.module';
       isGlobal: true,
     }),
     EmailModule,
+    RoomsModule,
   ],
   controllers: [],
   providers: [EmailService],
