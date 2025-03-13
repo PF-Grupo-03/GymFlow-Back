@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  UseGuards,
+} from '@nestjs/common';
 import { AppointmentsService } from './appointments.service';
 import { CreateAppointmentsDto } from './dtos/appointments.dto';
 import { PrismaService } from 'src/prisma.service';
@@ -11,12 +19,18 @@ import { UserRole } from 'src/enum/roles.enum';
 
 @Controller('appointments')
 export class AppointmentsController {
+  attendanceService: any;
   constructor(private readonly appointmentsService: AppointmentsService) {}
 
   @ApiBearerAuth()
   @Post()
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles(UserRole.USER_BASIC, UserRole.USER_PREMIUM, UserRole.USER_DIAMOND, UserRole.USER_ADMIN)
+  @Roles(
+    UserRole.USER_BASIC,
+    UserRole.USER_PREMIUM,
+    UserRole.USER_DIAMOND,
+    UserRole.USER_ADMIN,
+  )
   async createAppointment(@Body() createAppointmentDto: CreateAppointmentsDto) {
     return this.appointmentsService.createAppointment(createAppointmentDto);
   }
@@ -24,7 +38,12 @@ export class AppointmentsController {
   @ApiBearerAuth()
   @Get(':memberId')
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles(UserRole.USER_BASIC, UserRole.USER_PREMIUM, UserRole.USER_DIAMOND, UserRole.USER_ADMIN)
+  @Roles(
+    UserRole.USER_BASIC,
+    UserRole.USER_PREMIUM,
+    UserRole.USER_DIAMOND,
+    UserRole.USER_ADMIN,
+  )
   findAll(@Param('memberId') memberId: string) {
     return this.appointmentsService.findAll(memberId);
   }
@@ -32,7 +51,12 @@ export class AppointmentsController {
   @ApiBearerAuth()
   @Get('appointment/:id')
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles(UserRole.USER_BASIC, UserRole.USER_PREMIUM, UserRole.USER_DIAMOND, UserRole.USER_ADMIN)
+  @Roles(
+    UserRole.USER_BASIC,
+    UserRole.USER_PREMIUM,
+    UserRole.USER_DIAMOND,
+    UserRole.USER_ADMIN,
+  )
   findOne(@Param('id') id: string) {
     return this.appointmentsService.findOne(id);
   }
@@ -40,7 +64,12 @@ export class AppointmentsController {
   @ApiBearerAuth()
   @Patch(':id/status')
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles(UserRole.USER_BASIC, UserRole.USER_PREMIUM, UserRole.USER_DIAMOND, UserRole.USER_ADMIN)
+  @Roles(
+    UserRole.USER_BASIC,
+    UserRole.USER_PREMIUM,
+    UserRole.USER_DIAMOND,
+    UserRole.USER_ADMIN,
+  )
   updateAppointmentStatus(
     @Param('id') id: string,
     @Body() updateAppointmentStatusDto: UpdateAppointmentStatusDto,
@@ -49,6 +78,18 @@ export class AppointmentsController {
       id,
       updateAppointmentStatusDto.status,
     );
+  }
+
+  @Get(':id/qr')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(
+    UserRole.USER_BASIC,
+    UserRole.USER_PREMIUM,
+    UserRole.USER_DIAMOND,
+    UserRole.USER_ADMIN,
+  )
+  async generateQr(@Param('id') id: string) {
+    return this.attendanceService.generateQr(id);
   }
 }
 

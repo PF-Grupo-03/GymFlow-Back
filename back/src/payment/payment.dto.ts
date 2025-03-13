@@ -24,29 +24,6 @@ export class CreatePreferenceDto {
   userEmail: string;
 }
 
-export class ProcessPaymentDto {
-  @ApiProperty({ example: "1234567890" })
-  @IsString()
-  @IsNotEmpty()
-  paymentId: string;
-
-  @ApiProperty({ example: "approved" })
-  @IsString()
-  @IsNotEmpty()
-  status: string;
-
-  @ApiProperty({ example: 30000 })
-  @IsNumber()
-  @IsNotEmpty()
-  amount: number;
-
-  @ApiProperty({ example: "usuario@email.com" })
-  @IsString()
-  @IsNotEmpty()
-  userEmail: string;
-}
-
-
 
 
 

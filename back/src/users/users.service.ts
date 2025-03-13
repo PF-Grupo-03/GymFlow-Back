@@ -14,7 +14,7 @@ import { JwtService } from '@nestjs/jwt';
 export class UsersService {
   constructor(
     private readonly prisma: PrismaService,
-    private jwtService: JwtService
+    private jwtService: JwtService,
   ) {}
 
   private excludePassword(user: any) {
@@ -24,7 +24,15 @@ export class UsersService {
   }
 
   async getAllUsers() {
-    const users = await this.prisma.users.findMany();
+    const users = await this.prisma.users.findMany({
+      include: {
+        member: {
+          include: {
+            appointments: true,
+          },
+        },
+      },
+    });
 
     if (!users.length) throw new NotFoundException('Usuarios no encontrados');
 
@@ -37,7 +45,10 @@ export class UsersService {
       where: {
         id: id,
       },
-      include: { routines: { include: { routines: { include: { exercise: true } } } } },
+      include: {
+        member: true,
+        routines: { include: { routines: { include: { exercise: true } } } },
+      },
     });
 
     if (!user) throw new NotFoundException('Usuario no encontrado');
@@ -68,7 +79,7 @@ export class UsersService {
       where: { email },
       include: {
         member: true,
-      }
+      },
     });
     return user;
   }
@@ -123,12 +134,12 @@ export class UsersService {
         },
       });
       // Generamos el token de autenticación.
-    const payload = {
-      id: updatedUser.id,
-      email: updatedUser.email,
-      role: updatedUser.role,
-    };
-    const token = this.jwtService.sign(payload);
+      const payload = {
+        id: updatedUser.id,
+        email: updatedUser.email,
+        role: updatedUser.role,
+      };
+      const token = this.jwtService.sign(payload);
 
       const { password, ...userWithoutPassword } = updatedUser;
       return { userWithoutPassword, token };
