@@ -1,9 +1,9 @@
 import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { AttendanceService } from './attendance.service';
-import { UserRole } from '@prisma/client';
 import { Roles } from 'src/decorators/roles.decorators';
 import { AuthGuard } from 'src/guards/auth.guards';
 import { RolesGuard } from 'src/guards/roles.guards';
+import { UserRole } from 'src/enum/roles.enum';
 
 @Controller('attendance')
 export class AttendanceController {
