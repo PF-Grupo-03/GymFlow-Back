@@ -28,10 +28,10 @@ export class RolesGuard implements CanActivate {
     }
 
     // Obtiene los roles requeridos definidos en la metadata.
-    const requiredRoles = this.reflector.getAllAndOverride<UserRole[]>(ROLES_KEY, [
-      context.getHandler(),
-      context.getClass(),
-    ]);
+    const requiredRoles = this.reflector.getAllAndOverride<UserRole[]>(
+      ROLES_KEY,
+      [context.getHandler(), context.getClass()],
+    );
 
     // Si no se han definido roles requeridos, permite el acceso..
     if (!requiredRoles || requiredRoles.length === 0) {
@@ -42,7 +42,7 @@ export class RolesGuard implements CanActivate {
     const hasRole = requiredRoles.some((role) => user.roles.includes(role));
     if (!hasRole) {
       throw new ForbiddenException(
-        'Ustedsssss no tiene los permisos necesarios para acceder a esta ruta',
+        'Usted no tiene los permisos necesarios para acceder a esta ruta',
       );
     }
 

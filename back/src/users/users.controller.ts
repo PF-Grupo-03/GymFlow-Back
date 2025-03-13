@@ -38,6 +38,7 @@ export class UsersController {
     UserRole.USER_PREMIUM,
     UserRole.USER_DIAMOND,
     UserRole.USER_TRAINING,
+    UserRole.USER_MEMBER,
   )
   getUserById(@Param('id') id: string) {
     return this.usersService.getUserById(id);
