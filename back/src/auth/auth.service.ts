@@ -122,7 +122,7 @@ export class AuthService {
 
     const token = this.jwtService.sign(payload);
 
-    const { password, role, ...withoutPasswordAndRole } = user;
+    const { password, ...withoutPasswordAndRole } = user;
 
     return {
       withoutPasswordAndRole,
