@@ -56,6 +56,23 @@ export class UsersService {
     const { password, ...userWithoutPassword } = user;
     return userWithoutPassword;
   }
+  
+  async getUserByDni(dni: string) {
+    const userDni = await this.prisma.users.findUnique({
+      where: {
+        dni: dni,
+      },
+      include: {
+        member: true,
+        routines: { include: { routines: { include: { exercise: true } } } },
+      },
+    });
+
+    if (!userDni) throw new NotFoundException('Usuario no encontrado');
+
+    const { password, ...userWithoutPassword } = userDni;
+    return userWithoutPassword;
+  }
 
   async updateUser(id: string, updatedData: Partial<CreateUserDto>) {
     try {
