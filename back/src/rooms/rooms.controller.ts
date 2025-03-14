@@ -53,14 +53,14 @@ export class RoomsController {
   }
 
   @ApiBearerAuth()
-  @Patch(':id')
+  @Patch('update/:id')
   @UseGuards(AuthGuard, TrainerGuard)
   updateRoom(@Param('id') id: string, @Body() updateRoomDto: UpdateRoomDto) {
     return this.roomsService.updateRoom(id, updateRoomDto);
   }
 
   @ApiBearerAuth()
-  @Delete(':id')
+  @Delete('delete/:id')
   @UseGuards(AuthGuard, TrainerGuard)
   softDeleteRoom(@Param('id') id: string) {
     return this.roomsService.softDeleteRoom(id);
