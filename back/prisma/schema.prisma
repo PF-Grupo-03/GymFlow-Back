@@ -121,8 +121,8 @@ model Room {
   day         DayOfWeek   
   time        String       
   type        RoomType 
-  teacherId   String?       
-  teacher     Users?         @relation("TeacherRooms", fields: [teacherId], references: [id])
+  userId    String?  
+  teacher   Users?   @relation("TeacherRooms", fields: [userId], references: [id])
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
   appointments Appointment[]

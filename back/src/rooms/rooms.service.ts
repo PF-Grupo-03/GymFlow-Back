@@ -12,15 +12,15 @@ export class RoomsService {
 
   async createRoom(createRoomDto: CreateRoomDto) {
     if (createRoomDto.type === 'FUNCIONAL') {
-      if (!createRoomDto.teacherId) {
+      if (!createRoomDto.userId) {
         throw new BadRequestException(
           'Para una sala FUNCIONAL, debe asignarse un profesor.',
         );
       }
-      const teacher = await this.prisma.users.findUnique({
-        where: { id: createRoomDto.teacherId },
+      const user = await this.prisma.users.findUnique({
+        where: { id: createRoomDto.userId },
       });
-      if (!teacher || teacher.role !== 'USER_TRAINING') {
+      if (!user || user.role !== 'USER_TRAINING') {
         throw new BadRequestException(
           'El profesor asignado debe tener el rol USER_TRAINING.',
         );
@@ -33,8 +33,8 @@ export class RoomsService {
       time: createRoomDto.time,
       type: createRoomDto.type,
       isDeleted: false,
-      teacher: createRoomDto.teacherId
-        ? { connect: { id: createRoomDto.teacherId } }
+      teacher: createRoomDto.userId
+        ? { connect: { id: createRoomDto.userId } }
         : undefined,
     };
 
@@ -63,13 +63,13 @@ export class RoomsService {
     const existingRoom = await this.findOneById(id);
 
     if (updateRoomDto.type === 'FUNCIONAL') {
-      if (!updateRoomDto.teacherId) {
+      if (!updateRoomDto.userId) {
         throw new BadRequestException(
           'Para una sala FUNCIONAL, debe asignarse un profesor.',
         );
       }
       const teacher = await this.prisma.users.findUnique({
-        where: { id: updateRoomDto.teacherId },
+        where: { id: updateRoomDto.userId },
       });
       if (!teacher || teacher.role !== 'USER_TRAINING') {
         throw new BadRequestException(
@@ -83,8 +83,8 @@ export class RoomsService {
       day: updateRoomDto.day,
       time: updateRoomDto.time,
       type: updateRoomDto.type,
-      teacher: updateRoomDto.teacherId
-        ? { connect: { id: updateRoomDto.teacherId } }
+      teacher: updateRoomDto.userId
+        ? { connect: { id: updateRoomDto.userId } }
         : undefined,
     };
 

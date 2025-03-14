@@ -47,10 +47,10 @@ export class CreateRoomDto {
   @IsEnum(['MUSCULACION', 'FUNCIONAL'])
   type: string;
 
-  @ApiProperty({ example: 'uuid-del-entrenador', required: false })
+  @ApiProperty({ example: 'uuid-del-usuario', required: false })
   @IsOptional()
   @IsString()
-  teacherId?: string;
+  userId?: string;
 }
 
 export class UpdateRoomDto {
@@ -89,8 +89,8 @@ export class UpdateRoomDto {
   @IsEnum(['MUSCULACION', 'FUNCIONAL'])
   type?: string;
 
-  @ApiProperty({ example: 'uuid-del-entrenador', required: false })
+  @ApiProperty({ example: 'uuid-del-usuario', required: false })
   @IsOptional()
   @IsString()
-  teacherId?: string;
+  userId?: string;
 }
