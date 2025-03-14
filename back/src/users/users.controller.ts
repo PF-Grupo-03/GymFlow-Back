@@ -43,6 +43,21 @@ export class UsersController {
   getUserById(@Param('id') id: string) {
     return this.usersService.getUserById(id);
   }
+  
+  // @ApiBearerAuth()
+  @Get('dni/:dni')
+  // @UseGuards(AuthGuard, RolesGuard)
+  // @Roles(
+  //   UserRole.USER_ADMIN,
+  //   UserRole.USER_BASIC,
+  //   UserRole.USER_PREMIUM,
+  //   UserRole.USER_DIAMOND,
+  //   UserRole.USER_TRAINING,
+  //   UserRole.USER_MEMBER,
+  // )
+  getUserByDni(@Param('dni') dni: string) {
+    return this.usersService.getUserByDni(dni);
+  }
 
   @ApiBearerAuth()
   @Put('update-user/:id')
