@@ -11,6 +11,9 @@ export class RoomsService {
   constructor(private readonly prisma: PrismaService) {}
 
   async createRoom(createRoomDto: CreateRoomDto) {
+    const user = await this.prisma.users.findUnique({
+      where: { id: createRoomDto.userId },
+    });
     if (createRoomDto.type === 'FUNCIONAL') {
       if (!createRoomDto.userId) {
         throw new BadRequestException(
@@ -33,9 +36,7 @@ export class RoomsService {
       time: createRoomDto.time,
       type: createRoomDto.type,
       isDeleted: false,
-      teacher: createRoomDto.userId
-        ? { connect: { id: createRoomDto.userId } }
-        : undefined,
+      user: user ? { connect: { id: user.id } } : undefined,
     };
 
     return this.prisma.room.create({ data });
@@ -61,17 +62,17 @@ export class RoomsService {
 
   async updateRoom(id: string, updateRoomDto: UpdateRoomDto) {
     const existingRoom = await this.findOneById(id);
-
+    const user = await this.prisma.users.findUnique({
+      where: { id: updateRoomDto.userId },
+    });
     if (updateRoomDto.type === 'FUNCIONAL') {
       if (!updateRoomDto.userId) {
         throw new BadRequestException(
           'Para una sala FUNCIONAL, debe asignarse un profesor.',
         );
       }
-      const teacher = await this.prisma.users.findUnique({
-        where: { id: updateRoomDto.userId },
-      });
-      if (!teacher || teacher.role !== 'USER_TRAINING') {
+
+      if (!user || user.role !== 'USER_TRAINING') {
         throw new BadRequestException(
           'El profesor asignado debe tener el rol USER_TRAINING.',
         );
@@ -83,9 +84,7 @@ export class RoomsService {
       day: updateRoomDto.day,
       time: updateRoomDto.time,
       type: updateRoomDto.type,
-      teacher: updateRoomDto.userId
-        ? { connect: { id: updateRoomDto.userId } }
-        : undefined,
+      user: user ? { connect: { id: user.id } } : undefined,
     };
 
     return this.prisma.room.update({
