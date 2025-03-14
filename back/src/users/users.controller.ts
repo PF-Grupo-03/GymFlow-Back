@@ -44,17 +44,17 @@ export class UsersController {
     return this.usersService.getUserById(id);
   }
   
-  // @ApiBearerAuth()
+  @ApiBearerAuth()
   @Get('dni/:dni')
-  // @UseGuards(AuthGuard, RolesGuard)
-  // @Roles(
-  //   UserRole.USER_ADMIN,
-  //   UserRole.USER_BASIC,
-  //   UserRole.USER_PREMIUM,
-  //   UserRole.USER_DIAMOND,
-  //   UserRole.USER_TRAINING,
-  //   UserRole.USER_MEMBER,
-  // )
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(
+    UserRole.USER_ADMIN,
+    UserRole.USER_BASIC,
+    UserRole.USER_PREMIUM,
+    UserRole.USER_DIAMOND,
+    UserRole.USER_TRAINING,
+    UserRole.USER_MEMBER,
+  )
   getUserByDni(@Param('dni') dni: string) {
     return this.usersService.getUserByDni(dni);
   }
